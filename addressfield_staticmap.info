@@ -3,3 +3,4 @@ description = Provides a Google Static Map block based on the current node's add
 core = 7.x
 
 dependencies[] = addressfield
+dependencies[] = block
