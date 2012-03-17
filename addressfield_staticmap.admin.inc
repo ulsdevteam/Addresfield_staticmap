@@ -37,10 +37,16 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
   );
   $form['addressfield_staticmap_gmap_size'] = array(
     '#type' => 'textfield',
-    '#title' => t("Image Sizes"),
+    '#title' => t("Image Size"),
     '#description' => t('Output size of the map image. Default is 400x400, must be defined in WIDTHxHEIGHT format.'),
     '#default_value' => variable_get('addressfield_staticmap_gmap_size', '400x400'),
     '#required' => TRUE,
+  );
+  $form['addressfield_staticmap_gmap_link'] = array(
+    '#type' => 'checkbox',
+    '#title' => t("Link to actual Google map"),
+    '#description' => t('Check this option to link the static image to a Google map.'),
+    '#default_value' => variable_get('addressfield_staticmap_gmap_link', FALSE),
   );
   return system_settings_form($form);
 }

@@ -92,8 +92,14 @@ function addressfield_staticmap_block_view($delta = '') {
         $staticmap_url = "http://maps.googleapis.com/maps/api/staticmap?center=" . $address . "&zoom=" . $zoom . 
           "&size=" . $size . "&sensor=false&markers=color:green%7C" . $address;
         
-        $block['content'] .= '<img src="' . $staticmap_url . '">';
+        $image = '<img src="' . $staticmap_url . '">';
+        // Link to actual Google map
+        if (variable_get('addressfield_staticmap_gmap_link', FALSE)) {
+          $image = '<a title="' . t("Go to Google map of this location") . '" href="http://maps.google.com/maps?q=' . $address . '">' . $image . '</a>';
+        }
+        $block['content'] .= $image;
       }
+
     }
   }
   return $block;
