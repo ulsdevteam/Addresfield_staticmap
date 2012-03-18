@@ -75,6 +75,7 @@ function addressfield_staticmap_block_view($delta = '') {
       $context = array('mode' => 'render');
       $zoom = variable_get('addressfield_staticmap_gmap_zoom', 14);
       $size = variable_get('addressfield_staticmap_gmap_size', '400x400');
+      $maptype = variable_get('addressfield_staticmap_gmap_type', 'roadmap');
       
       foreach ($fields as $id => $data) {
         $data_cleaned = array_filter($data);
@@ -90,7 +91,7 @@ function addressfield_staticmap_block_view($delta = '') {
         $address = urlencode(strip_tags($address));
         
         $staticmap_url = "http://maps.googleapis.com/maps/api/staticmap?center=" . $address . "&zoom=" . $zoom . 
-          "&size=" . $size . "&sensor=false&markers=color:green%7C" . $address;
+          "&size=" . $size . "&maptype=" . $maptype ."&sensor=false&markers=color:green%7C" . $address;
         
         $image = '<img src="' . $staticmap_url . '">';
         // Link to actual Google map

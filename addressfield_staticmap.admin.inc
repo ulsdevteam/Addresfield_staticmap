@@ -48,6 +48,13 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
     '#description' => t('Check this option to link the static image to a Google map.'),
     '#default_value' => variable_get('addressfield_staticmap_gmap_link', FALSE),
   );
+  $form['addressfield_staticmap_gmap_type'] = array(
+    '#type' => 'select',
+    '#title' => t("Map Type"),
+    '#description' => t('Check this option to link the static image to a Google map.'),
+    '#default_value' => variable_get('addressfield_staticmap_gmap_type', 'roadmap'),
+    '#options' => drupal_map_assoc(array('roadmap', 'satellite', 'terrain', 'hybrid')),
+  );
   return system_settings_form($form);
 }
 
