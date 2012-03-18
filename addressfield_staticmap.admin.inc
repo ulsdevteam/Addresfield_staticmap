@@ -55,6 +55,12 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
     '#default_value' => variable_get('addressfield_staticmap_gmap_type', 'roadmap'),
     '#options' => drupal_map_assoc(array('roadmap', 'satellite', 'terrain', 'hybrid')),
   );
+  $form['addressfield_staticmap_gmap_icon_url'] = array(
+    '#type' => 'textfield',
+    '#title' => t("Custom Icon"),
+    '#description' => t('Optional path for custom icon to use instead of the regular Google map marker. Must be smaller than 64x64.'),
+    '#default_value' => variable_get('addressfield_staticmap_gmap_icon_url', ''),
+  );
   return system_settings_form($form);
 }
 
@@ -71,6 +77,12 @@ function addressfield_staticmap_admin_form_validate($form, &$form_state) {
   $size = $form_state['values']['addressfield_staticmap_gmap_size'];
   if (empty($size) && !preg_match('/^([0-9]+)x([0-9]+)$/', $size)) {
     form_set_error('addressfield_staticmap_gmap_size', t('Invalid image size. Please enter a validly formatted dimension (ex: 400x400).'));
+    return;
+  }
+  
+  $icon_url = $form_state['values']['addressfield_staticmap_gmap_icon_url'];
+  if (!empty($icon_url) && !valid_url($icon_url)) {
+    form_set_error('addressfield_staticmap_gmap_icon_url', t('Invalid icon URL.'));
     return;
   }
 }
