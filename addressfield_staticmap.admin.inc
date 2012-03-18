@@ -58,7 +58,7 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
   $form['addressfield_staticmap_gmap_icon_url'] = array(
     '#type' => 'textfield',
     '#title' => t("Custom Icon"),
-    '#description' => t('Optional path for custom icon to use instead of the regular Google map marker. Must be smaller than 64x64.'),
+    '#description' => t('Optional URL for custom icon to use instead of the regular Google map marker. Must be smaller than 64x64.'),
     '#default_value' => variable_get('addressfield_staticmap_gmap_icon_url', ''),
   );
   return system_settings_form($form);

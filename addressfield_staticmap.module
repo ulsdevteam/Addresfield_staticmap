@@ -68,43 +68,43 @@ function addressfield_staticmap_block_view($delta = '') {
   // Do this for each of the enabled address fields
   foreach ($field_names as $field_name) {
     $fields = field_get_items('node', $node, $field_name, $node->language);
+    if (empty($fields)) {
+      continue;
+    }
     
-    if (!empty($fields)) {
-      // Set up some default arguments for addressfield_generate() 
-      $handlers = array('address' => 'address');
-      $context = array('mode' => 'render');
-      
-      // Fetch configuration variables
-      $zoom = variable_get('addressfield_staticmap_gmap_zoom', 14);
-      $size = variable_get('addressfield_staticmap_gmap_size', '400x400');
-      $maptype = variable_get('addressfield_staticmap_gmap_type', 'roadmap');
-      $icon_url = variable_get('addressfield_staticmap_gmap_icon_url', '');
-      $icon_url = empty($icon_url) ? 'color:green' : 'icon:' . $icon_url;
-      
-      foreach ($fields as $id => $data) {
-        $data_cleaned = array_filter($data);
-        // If only the country is set, skip this (for some reason the country value
-        // becomes mandatory if you limit the list)
-        if (isset($data_cleaned['country']) && sizeof($data_cleaned) <= 1) {
-          continue;
-        }
-        
-        $address = drupal_render(addressfield_generate($data, $handlers, $context));
-        // Add some white space so that the address can still be parsed by Google Map's API
-        $address = preg_replace('/(<\/[^>]+?>)(<[^>\/][^>]*?>)/', '$1 $2', $address);
-        $address = urlencode(strip_tags($address));
-        
-        $staticmap_url = "http://maps.googleapis.com/maps/api/staticmap?center=" . $address . "&zoom=" . $zoom . 
-          "&size=" . $size . "&maptype=" . $maptype ."&sensor=false&markers=" . $icon_url . "%7C" . $address;
-        
-        $image = '<img src="' . $staticmap_url . '">';
-        // Link to actual Google map
-        if (variable_get('addressfield_staticmap_gmap_link', FALSE)) {
-          $image = '<a title="' . t("Go to Google map of this location") . '" href="http://maps.google.com/maps?q=' . $address . '">' . $image . '</a>';
-        }
-        $block['content'] .= $image;
+    // Set up some default arguments for addressfield_generate() 
+    $handlers = array('address' => 'address');
+    $context = array('mode' => 'render');
+    
+    // Fetch configuration variables
+    $zoom = variable_get('addressfield_staticmap_gmap_zoom', 14);
+    $size = variable_get('addressfield_staticmap_gmap_size', '400x400');
+    $maptype = variable_get('addressfield_staticmap_gmap_type', 'roadmap');
+    $icon_url = variable_get('addressfield_staticmap_gmap_icon_url', '');
+    $icon_url = empty($icon_url) ? 'color:green' : 'icon:' . $icon_url;
+    
+    foreach ($fields as $id => $data) {
+      $data_cleaned = array_filter($data);
+      // If only the country is set, skip this (for some reason the country value
+      // becomes mandatory if you limit the list)
+      if (isset($data_cleaned['country']) && sizeof($data_cleaned) <= 1) {
+        continue;
       }
-
+      
+      $address = drupal_render(addressfield_generate($data, $handlers, $context));
+      // Add some white space so that the address can still be parsed by Google Map's API
+      $address = preg_replace('/(<\/[^>]+?>)(<[^>\/][^>]*?>)/', '$1 $2', $address);
+      $address = urlencode(strip_tags($address));
+      
+      $staticmap_url = "http://maps.googleapis.com/maps/api/staticmap?center=" . $address . "&zoom=" . $zoom . 
+        "&size=" . $size . "&maptype=" . $maptype ."&sensor=false&markers=" . $icon_url . "%7C" . $address;
+      
+      $image = '<img src="' . $staticmap_url . '">';
+      // Link to actual Google map
+      if (variable_get('addressfield_staticmap_gmap_link', FALSE)) {
+        $image = '<a title="' . t("Go to Google map of this location") . '" href="http://maps.google.com/maps?q=' . $address . '">' . $image . '</a>';
+      }
+      $block['content'] .= $image;
     }
   }
   return $block;
