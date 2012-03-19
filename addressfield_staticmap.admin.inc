@@ -49,7 +49,7 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
   $form['addressfield_staticmap_gmap_zoom'] = array(
     '#type' => 'textfield',
     '#title' => t("Zoom Level"),
-    '#description' => t('The resolution of the zoom level to use with Google Static Maps API, can be between 0 and 21. Default is 14.'),
+    '#description' => t('The resolution of the zoom level to use on the map. Can be between 0 and 21 for Google Static Maps API, and 1 and 16 for Mapquest. Default is 14.'),
     '#default_value' => variable_get('addressfield_staticmap_gmap_zoom', 14),
     '#required' => TRUE,
   );
@@ -60,22 +60,22 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
     '#default_value' => variable_get('addressfield_staticmap_gmap_size', '400x400'),
     '#required' => TRUE,
   );
+  $form['addressfield_staticmap_gmap_type'] = array(
+    '#type' => 'select',
+    '#title' => t("Map Type"),
+    '#description' => t('The format to use for the rendered map. Hybrid blends satellite and roadmap.'),
+    '#default_value' => variable_get('addressfield_staticmap_gmap_type', 'roadmap'),
+    '#options' => drupal_map_assoc(array('roadmap', 'satellite', 'terrain', 'hybrid')),
+  );
   $form['addressfield_staticmap_gmap_link'] = array(
     '#type' => 'checkbox',
     '#title' => t("Link to actual Google map"),
     '#description' => t('Check this option to link the static image to a Google map.'),
     '#default_value' => variable_get('addressfield_staticmap_gmap_link', FALSE),
   );
-  $form['addressfield_staticmap_gmap_type'] = array(
-    '#type' => 'select',
-    '#title' => t("Map Type"),
-    '#description' => t('Check this option to link the static image to a Google map.'),
-    '#default_value' => variable_get('addressfield_staticmap_gmap_type', 'roadmap'),
-    '#options' => drupal_map_assoc(array('roadmap', 'satellite', 'terrain', 'hybrid')),
-  );
   $form['addressfield_staticmap_gmap_icon_url'] = array(
     '#type' => 'textfield',
-    '#title' => t("Custom Icon"),
+    '#title' => t("Custom Google Map Icon URL"),
     '#description' => t('Optional URL for custom icon to use instead of the regular Google map marker. Must be smaller than 64x64.'),
     '#default_value' => variable_get('addressfield_staticmap_gmap_icon_url', ''),
   );
@@ -87,9 +87,18 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
  */
 function addressfield_staticmap_admin_form_validate($form, &$form_state) {
   $zoom = $form_state['values']['addressfield_staticmap_gmap_zoom'];
-  if (empty($zoom) || $zoom < 0 || $zoom > 21 || !is_numeric($zoom)) {
-    form_set_error('addressfield_staticmap_gmap_zoom', t('Invalid zoom level. Please enter a value between 0 and 21.'));
-    return;
+  $api = $form_state['values']['addressfield_staticmap_api'];
+  if ($api == 'google_maps') {
+    if (empty($zoom) || $zoom < 0 || $zoom > 21 || !is_numeric($zoom)) {
+      form_set_error('addressfield_staticmap_gmap_zoom', t('Invalid zoom level. Please enter a value from 0 and 21.'));
+      return;
+    }
+  }
+  elseif ($api == 'mapquest') {
+    if (empty($zoom) || $zoom < 1 || $zoom > 16 || !is_numeric($zoom)) {
+      form_set_error('addressfield_staticmap_gmap_zoom', t('Invalid zoom level. Please enter a value from 1 and 16.'));
+      return;
+    }
   }
   
   $size = $form_state['values']['addressfield_staticmap_gmap_size'];
@@ -105,7 +114,6 @@ function addressfield_staticmap_admin_form_validate($form, &$form_state) {
   }
 
   // Mapquest requires an API key
-  $api = $form_state['values']['addressfield_staticmap_api'];
   $api_key = $form_state['values']['addressfield_staticmap_api_key'];
   if ($api == 'mapquest' && empty($api_key)) {
     form_set_error('addressfield_staticmap_api_key', t('Mapquest requires an API key.'));
