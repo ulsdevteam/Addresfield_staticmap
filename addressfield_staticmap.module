@@ -121,7 +121,7 @@ function addressfield_staticmap_block_view($delta = '') {
  */
 function _addressfield_static_map_render_google_maps_image($address, $settings) {
   $staticmap_url = "http://maps.googleapis.com/maps/api/staticmap?center=" . $address . "&zoom=" . $settings['zoom'] . 
-    "&size=" . $settings['size'] . "&maptype=" . $settings['maptype'] ."&sensor=false&markers=" . 
+    "&size=" . $settings['size'] . "&maptype=" . $settings['maptype'] . "&sensor=false&markers=" . 
     $settings['icon_url'] . "%7C" . $address;
   
   $image = '<img src="' . $staticmap_url . '">';
