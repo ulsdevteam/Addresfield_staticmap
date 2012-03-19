@@ -20,6 +20,24 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
     }
   }
   
+  $apis = array(
+    'google_maps' => t('Google Maps'),
+    'mapquest' => t('Mapquest'),
+  );
+  
+  $form['addressfield_staticmap_api'] = array(
+    '#type' => 'select',
+    '#title' => t("Mapping API"),
+    '#description' => t('The API service to use to render static images. Some may require an API key.'),
+    '#default_value' => variable_get('addressfield_staticmap_api', 'google_maps'),
+    '#options' => $apis,
+  );
+  $form['addressfield_staticmap_api_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t("API Key"),
+    '#description' => t('Some services (ex: Mapquest) require an API key to be used.'),
+    '#default_value' => variable_get('addressfield_staticmap_api_key', ''),
+  );
   $form['addressfield_staticmap_field_names'] = array(
     '#type' => 'select',
     '#title' => t("Address Field"),
@@ -83,6 +101,14 @@ function addressfield_staticmap_admin_form_validate($form, &$form_state) {
   $icon_url = $form_state['values']['addressfield_staticmap_gmap_icon_url'];
   if (!empty($icon_url) && !valid_url($icon_url)) {
     form_set_error('addressfield_staticmap_gmap_icon_url', t('Invalid icon URL.'));
+    return;
+  }
+
+  // Mapquest requires an API key
+  $api = $form_state['values']['addressfield_staticmap_api'];
+  $api_key = $form_state['values']['addressfield_staticmap_api_key'];
+  if ($api == 'mapquest' && empty($api_key)) {
+    form_set_error('addressfield_staticmap_api_key', t('Mapquest requires an API key.'));
     return;
   }
 }

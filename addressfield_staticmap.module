@@ -77,11 +77,14 @@ function addressfield_staticmap_block_view($delta = '') {
     $context = array('mode' => 'render');
     
     // Fetch configuration variables
-    $zoom = variable_get('addressfield_staticmap_gmap_zoom', 14);
-    $size = variable_get('addressfield_staticmap_gmap_size', '400x400');
-    $maptype = variable_get('addressfield_staticmap_gmap_type', 'roadmap');
-    $icon_url = variable_get('addressfield_staticmap_gmap_icon_url', '');
-    $icon_url = empty($icon_url) ? 'color:green' : 'icon:' . $icon_url;
+    $api = variable_get('addressfield_staticmap_api', 'google_maps');
+    
+    // Configure base settings
+    $settings = array(
+      'zoom' => variable_get('addressfield_staticmap_gmap_zoom', 14),
+      'size' => variable_get('addressfield_staticmap_gmap_size', '400x400'),
+      'maptype' => $maptype = variable_get('addressfield_staticmap_gmap_type', 'roadmap'),
+    );
     
     foreach ($fields as $id => $data) {
       $data_cleaned = array_filter($data);
@@ -96,17 +99,60 @@ function addressfield_staticmap_block_view($delta = '') {
       $address = preg_replace('/(<\/[^>]+?>)(<[^>\/][^>]*?>)/', '$1 $2', $address);
       $address = urlencode(strip_tags($address));
       
-      $staticmap_url = "http://maps.googleapis.com/maps/api/staticmap?center=" . $address . "&zoom=" . $zoom . 
-        "&size=" . $size . "&maptype=" . $maptype ."&sensor=false&markers=" . $icon_url . "%7C" . $address;
-      
-      $image = '<img src="' . $staticmap_url . '">';
-      // Link to actual Google map
-      if (variable_get('addressfield_staticmap_gmap_link', FALSE)) {
-        $image = '<a title="' . t("Go to Google map of this location") . '" href="http://maps.google.com/maps?q=' . $address . '">' . $image . '</a>';
+      // Use Google Maps
+      if ($api == 'google_maps') {
+        $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url', '');
+        $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
+        $block['content'] .= _addressfield_static_map_render_google_maps_image($address, $settings);
       }
-      $block['content'] .= $image;
+      // Use Mapquest
+      elseif ($api == 'mapquest') {
+        $settings['api_key'] = variable_get('addressfield_staticmap_api_key', '');
+        $block['content'] .= _addressfield_static_map_render_mapquest_image($address, $settings);
+      }
     }
   }
   return $block;
 
+}
+
+/**
+ * Render static Google Map image for a specific address
+ */
+function _addressfield_static_map_render_google_maps_image($address, $settings) {
+  $staticmap_url = "http://maps.googleapis.com/maps/api/staticmap?center=" . $address . "&zoom=" . $settings['zoom'] . 
+    "&size=" . $settings['size'] . "&maptype=" . $settings['maptype'] ."&sensor=false&markers=" . 
+    $settings['icon_url'] . "%7C" . $address;
+  
+  $image = '<img src="' . $staticmap_url . '">';
+  // Link to actual Google map
+  if (variable_get('addressfield_staticmap_gmap_link', FALSE)) {
+    $image = '<a title="' . t("Go to Google map of this location") .
+      '" href="http://maps.google.com/maps?q=' . $address . '">' . $image . '</a>';
+  }
+  return $image;
+}
+
+/**
+ * Render static Mapquest image for a specific address
+ */
+function _addressfield_static_map_render_mapquest_image($address, $settings) {
+  $settings['size'] = str_replace('x', ',', $settings['size']);
+  
+  // Codes for map types are not the same, alter them
+  $map_types = array(
+    'roadmap' => 'map',
+    'satellite' => 'sat',
+    'hybrid' => 'hyb',
+    'terrain' => 'map',
+  );
+  $settings['maptype'] = $map_types[$settings['maptype']];
+  
+  $staticmap_url = "http://www.mapquestapi.com/staticmap/v3/getplacemap?key=" . $settings['api_key'] . 
+    "&location=" . $address . "&size=" . $settings['size'] . "&type=" . $settings['maptype'] . "&zoom=" . $settings['zoom'] .
+    "&imagetype=jpeg&showicon=green-1";
+  
+  $image = '<img src="' . $staticmap_url . '">';
+  
+  return $image;
 }
