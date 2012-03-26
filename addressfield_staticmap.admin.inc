@@ -21,7 +21,8 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
   }
   
   $apis = array(
-    'google_maps' => t('Google Maps'),
+    'google_maps' => t('Google Static Maps'),
+    'google_maps_api' => t('regular Google Maps with fallback to Static Map'),
     'mapquest' => t('Mapquest'),
   );
   

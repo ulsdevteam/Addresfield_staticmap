@@ -105,6 +105,11 @@ function addressfield_staticmap_block_view($delta = '') {
         $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
         $block['content'] .= _addressfield_static_map_render_google_maps_image($address, $settings);
       }
+      elseif ($api == 'google_maps_api') {
+        $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url', '');
+        $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
+        $block['content'] .= _addressfield_static_map_render_google_maps($address, $settings);
+      }
       // Use Mapquest
       elseif ($api == 'mapquest') {
         $settings['api_key'] = variable_get('addressfield_staticmap_api_key', '');
@@ -131,6 +136,25 @@ function _addressfield_static_map_render_google_maps_image($address, $settings) 
       '" href="http://maps.google.com/maps?q=' . $address . '">' . $image . '</a>';
   }
   return $image;
+}
+
+function addressfield_staticmap_theme() {
+  return array(
+    'addressfield_staticmap' => array(
+      'variables' => array('address' => NULL, 'settings' => NULL, 'image' => NULL),
+      'template' => 'addressfield-staticmap-google-map',
+    ),
+  );
+}
+/**
+ * Render regular Google Map for a specific address
+ */
+function _addressfield_static_map_render_google_maps($address, $settings) {
+  drupal_add_js('http://maps.googleapis.com/maps/api/js?sensor=false', 'external');
+  $image = _addressfield_static_map_render_google_maps_image($address, $settings);
+  $render = theme('addressfield_staticmap', array('address' => $address, 'settings' => $settings, 'image' => $image));
+  return $render;
+  
 }
 
 /**
