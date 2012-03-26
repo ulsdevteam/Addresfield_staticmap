@@ -8,7 +8,11 @@
   
   var myOptions = {
     zoom: <?php print $settings['zoom']; ?>,
-    mapTypeId: google.maps.MapTypeId.<?php print strtoupper($settings['maptype']); ?>
+    mapTypeId: google.maps.MapTypeId.<?php print strtoupper($settings['maptype']); ?>,
+    //disableDefaultUI: true,
+    scrollwheel: false,
+    draggable: false,
+    disableDoubleClickZoom: true
   }
   var map = new google.maps.Map(document.getElementById('map_canvas'), myOptions); 
     
