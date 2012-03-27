@@ -74,6 +74,25 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
     '#description' => t('Check this option to link the static image to a Google map.'),
     '#default_value' => variable_get('addressfield_staticmap_gmap_link', FALSE),
   );
+  $form['addressfield_staticmap_directions'] = array(
+    '#type' => 'fieldset',
+    '#title' => t("Get Directions link"),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['addressfield_staticmap_directions']['addressfield_staticmap_directions_link'] = array(
+    '#type' => 'checkbox',
+    '#title' => t("Display Get Directions"),
+    '#description' => t('Check this option to display a text link to a Google map.'),
+    '#default_value' => variable_get('addressfield_staticmap_directions_link', FALSE),
+  );
+  $form['addressfield_staticmap_directions']['addressfield_staticmap_directions_text'] = array(
+    '#type' => 'textfield',
+    '#title' => t("Get Directions text"),
+    '#description' => t('What this link should use as text.'),
+    '#default_value' => variable_get('addressfield_staticmap_directions_text', 'Get Directions'),
+    '#required' => TRUE,
+  );
   $form['addressfield_staticmap_gmap_icon_url'] = array(
     '#type' => 'textfield',
     '#title' => t("Custom Google Map Icon URL"),
