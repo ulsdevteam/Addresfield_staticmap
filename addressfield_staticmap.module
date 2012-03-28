@@ -53,7 +53,7 @@ function addressfield_staticmap_block_view($delta = '') {
   // Check if the address field name is configured
   $field_names = variable_get('addressfield_staticmap_field_names', '');
   
-  if (empty($field_names)) {
+  if (empty($field_names) || !array_filter($field_names)) {  
     return $block;
   }
   
