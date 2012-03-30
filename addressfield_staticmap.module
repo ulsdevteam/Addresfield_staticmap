@@ -108,7 +108,7 @@ function addressfield_staticmap_block_view($delta = '') {
       elseif ($api == 'google_maps_api') {
         $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url', '');
         $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
-        $block['content'] .= _addressfield_static_map_render_google_maps($address, $settings);
+        $block['content'] .= _addressfield_static_map_render_google_maps($address, $settings, $node);
       }
       // Use Mapquest
       elseif ($api == 'mapquest') {
@@ -151,7 +151,7 @@ function _addressfield_static_map_render_google_maps_image($address, $settings) 
 function addressfield_staticmap_theme() {
   return array(
     'addressfield_staticmap' => array(
-      'variables' => array('address' => NULL, 'settings' => NULL, 'image' => NULL),
+      'variables' => array('address' => NULL, 'settings' => NULL, 'image' => NULL, 'kml_paths' => NULL),
       'template' => 'addressfield-staticmap-google-map',
     ),
   );
@@ -159,10 +159,36 @@ function addressfield_staticmap_theme() {
 /**
  * Render regular Google Map for a specific address
  */
-function _addressfield_static_map_render_google_maps($address, $settings) {
+function _addressfield_static_map_render_google_maps($address, $settings, $node) {
   drupal_add_js('http://maps.googleapis.com/maps/api/js?sensor=false', 'external');
   $image = _addressfield_static_map_render_google_maps_image($address, $settings);
-  $render = theme('addressfield_staticmap', array('address' => $address, 'settings' => $settings, 'image' => $image));
+  
+  // Additional processing to attach optional KML file(s)
+  $kml_field_names = array_filter(variable_get('addressfield_staticmap_field_kml', ''));
+  if (!empty($kml_field_names)) {
+    
+    $kml_paths = array();
+    
+    foreach ($kml_field_names as $kml_field) {
+      $kml_field = explode('|', $kml_field);
+      
+      // Check to see if the valid field settings are for this bundle  
+      if ($node->type != $kml_field[0]) {
+        continue;
+      }
+      $kml_files = field_get_items('node', $node, $kml_field[1], $node->language);
+      foreach ($kml_files as $kml_file) {
+        $kml_paths[] = file_create_url($kml_file['uri']);
+      }
+    }
+  }
+  
+  $render = theme('addressfield_staticmap', array(
+    'address' => $address,
+    'settings' => $settings,
+    'image' => $image,
+    'kml_paths' => $kml_paths, 
+  ));
   return $render;
   
 }

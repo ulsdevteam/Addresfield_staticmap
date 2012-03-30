@@ -12,11 +12,27 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
   $address_fields = array(
     '' => t('None'),
   );
+  $kml_fields = $address_fields;
   
   $fields = field_info_fields();
   foreach ($fields as $name => $field) {
+    // Only display addressfields for this setting
     if ($field['type'] == 'addressfield') {
       $address_fields[$name] = $name;
+    }
+    
+    // Only display file fields that only accept KML uploads
+    if ($field['type'] != 'file') {
+      continue;
+    }
+    if (!isset($field['bundles']['node'])) {
+      continue;
+    }
+    foreach ($field['bundles']['node'] as $bundle_name) {
+      $field_instance = field_info_instance('node', $name, $bundle_name);
+      if ($field_instance['settings']['file_extensions'] == 'kml') {
+        $kml_fields[$bundle_name . '|' . $name] = $name . ' (' . $bundle_name . ')';
+      }
     }
   }
   
@@ -45,6 +61,15 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
     '#description' => t('The address field(s) that should be used to generate the static map block.'),
     '#default_value' => variable_get('addressfield_staticmap_field_names', ''),
     '#options' => $address_fields,
+    '#multiple' => TRUE,
+  );
+  $form['addressfield_staticmap_field_kml'] = array(
+    '#type' => 'select',
+    '#title' => t("KML File Field"),
+    '#description' => t('The file field(s) and specific bundles that should be used to attach KML files. 
+      Will only list file fields that only accept .kml files.'),
+    '#default_value' => variable_get('addressfield_staticmap_field_kml', ''),
+    '#options' => $kml_fields,
     '#multiple' => TRUE,
   );
   $form['addressfield_staticmap_gmap_zoom'] = array(
