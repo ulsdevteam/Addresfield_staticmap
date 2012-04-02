@@ -192,6 +192,9 @@ function _addressfield_static_map_render_google_maps($address, $settings, $node)
         continue;
       }
       $kml_files = field_get_items('node', $node, $kml_field[1], $node->language);
+      if (empty($kml_files)) {
+        continue;
+      }
       foreach ($kml_files as $kml_file) {
         $kml_paths[] = file_create_url($kml_file['uri']);
       }
