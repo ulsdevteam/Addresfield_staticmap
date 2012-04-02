@@ -139,7 +139,7 @@ function _addressfield_static_map_render_google_maps_image($address, $settings) 
     $image = '<div>' . l($link_text, $link, array('attributes' => array('title' => $link_text))) . '</div>';
   }
   
-  $image .= '<img src="' . $staticmap_url . '">';
+  $image .= '<img class="static_google_map" src="' . $staticmap_url . '">';
   // Link to actual Google map
   if (variable_get('addressfield_staticmap_gmap_link', FALSE)) {
     $image = '<a title="' . t("Go to Google map of this location") .
@@ -148,6 +148,12 @@ function _addressfield_static_map_render_google_maps_image($address, $settings) 
   return $image;
 }
 
+/**
+ * Implements hook_theme().
+ * 
+ * Provides theming function used when a regular Google Map is rendered with
+ * a static image fallback.
+ */
 function addressfield_staticmap_theme() {
   return array(
     'addressfield_staticmap' => array(
