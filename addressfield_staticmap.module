@@ -202,7 +202,7 @@ function _addressfield_static_map_render_google_maps($address, $settings, $node)
   }
   
   $render = theme('addressfield_staticmap', array(
-    'address' => $address,
+    'address' => urldecode($address),
     'settings' => $settings,
     'image' => $image,
     'kml_paths' => $kml_paths, 
