@@ -1,6 +1,6 @@
 <?php $size = explode('x', $settings['size']); ?>
 
-<div class="clearfix" id="map_canvas" style="overflow: scroll; width: <?php print $size[0]; ?>px; height: <?php print $size[1]; ?>px;">
+<div id="map_canvas" style="width: <?php print $size[0]; ?>px; height: <?php print $size[1]; ?>px;">
   <noscript><?php print $image; ?></noscript>
 </div>
 

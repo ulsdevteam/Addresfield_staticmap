@@ -161,6 +161,7 @@ function addressfield_staticmap_theme() {
  */
 function _addressfield_static_map_render_google_maps($address, $settings, $node) {
   drupal_add_js('http://maps.googleapis.com/maps/api/js?sensor=false', 'external');
+  drupal_add_css(drupal_get_path('module', 'addressfield_staticmap') . '/addressfield_staticmap.css');
   $image = _addressfield_static_map_render_google_maps_image($address, $settings);
   
   // Additional processing to attach optional KML file(s)
