@@ -36,6 +36,10 @@ function addressfield_staticmap_block_info() {
     'info' => t('Address Field Static Map'),
     'cache' => DRUPAL_CACHE_PER_PAGE,
   );
+  $blocks['addressfield_staticmap_alt'] = array(
+    'info' => t('Address Field Static Map (alternate)'),
+    'cache' => DRUPAL_CACHE_PER_PAGE,
+  );
   
   return $blocks;
 }
@@ -46,9 +50,11 @@ function addressfield_staticmap_block_info() {
 function addressfield_staticmap_block_view($delta = '') {
   $block = array();
   
-  if ($delta != 'addressfield_staticmap') {
+  $deltas = array('addressfield_staticmap', 'addressfield_staticmap_alt');
+  if (!in_array($delta, $deltas)) {
     return $block;
   }
+  $index = array_search($delta, $deltas);
   
   // Check if the address field name is configured
   $field_names = variable_get('addressfield_staticmap_field_names', '');
@@ -77,13 +83,14 @@ function addressfield_staticmap_block_view($delta = '') {
     $context = array('mode' => 'render');
     
     // Fetch configuration variables
-    $api = variable_get('addressfield_staticmap_api', 'google_maps');
+    $api = variable_get('addressfield_staticmap_api_' . $index, 'google_maps');
     
     // Configure base settings
     $settings = array(
-      'zoom' => variable_get('addressfield_staticmap_gmap_zoom', 14),
-      'size' => variable_get('addressfield_staticmap_gmap_size', '400x400'),
-      'maptype' => $maptype = variable_get('addressfield_staticmap_gmap_type', 'roadmap'),
+      'zoom' => variable_get('addressfield_staticmap_gmap_zoom_' . $index, 14),
+      'size' => variable_get('addressfield_staticmap_gmap_size_' . $index, '400x400'),
+      'maptype' => $maptype = variable_get('addressfield_staticmap_gmap_type_' . $index, 'roadmap'),
+      'index' => $index,
     );
     
     foreach ($fields as $id => $data) {
@@ -101,12 +108,12 @@ function addressfield_staticmap_block_view($delta = '') {
       
       // Use Google Maps
       if ($api == 'google_maps') {
-        $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url', '');
+        $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $index, '');
         $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
         $block['content'] .= _addressfield_static_map_render_google_maps_image($address, $settings);
       }
       elseif ($api == 'google_maps_api') {
-        $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url', '');
+        $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $index, '');
         $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
         $block['content'] .= _addressfield_static_map_render_google_maps($address, $settings, $node);
       }
@@ -132,16 +139,17 @@ function _addressfield_static_map_render_google_maps_image($address, $settings) 
   // Google Maps link
   $link = "http://maps.google.com/maps?q=" . $address;
   $image = "";
+  $index = $settings['index'];
   
   // Add 'Get Directions' text link
-  if (variable_get('addressfield_staticmap_directions_link')) {
-    $link_text = check_plain(variable_get('addressfield_staticmap_directions_text', 'Get Directions'));
+  if (variable_get('addressfield_staticmap_directions_link_' . $index)) {
+    $link_text = check_plain(variable_get('addressfield_staticmap_directions_text_' . $index, 'Get Directions'));
     $image = '<div>' . l($link_text, $link, array('attributes' => array('title' => $link_text))) . '</div>';
   }
   
   $image .= '<img class="static_google_map" src="' . $staticmap_url . '">';
   // Link to actual Google map
-  if (variable_get('addressfield_staticmap_gmap_link', FALSE)) {
+  if (variable_get('addressfield_staticmap_gmap_link_' . $index, FALSE)) {
     $image = '<a title="' . t("Go to Google map of this location") .
       '" href="' . $link . '">' . $image . '</a>';
   }
