@@ -177,12 +177,11 @@ function _addressfield_static_map_render_google_maps($address, $settings, $node)
   drupal_add_js('http://maps.googleapis.com/maps/api/js?sensor=false', 'external');
   drupal_add_css(drupal_get_path('module', 'addressfield_staticmap') . '/addressfield_staticmap.css');
   $image = _addressfield_static_map_render_google_maps_image($address, $settings);
-  
-  // Additional processing to attach optional KML file(s)
-  $kml_field_names = array_filter(variable_get('addressfield_staticmap_field_kml', ''));
-  if (!empty($kml_field_names)) {
+  $kml_paths = array();
     
-    $kml_paths = array();
+  // Additional processing to attach optional KML file(s)
+  $kml_field_names = array_filter(variable_get('addressfield_staticmap_field_kml', array()));
+  if (!empty($kml_field_names)) {
     
     foreach ($kml_field_names as $kml_field) {
       $kml_field = explode('|', $kml_field);

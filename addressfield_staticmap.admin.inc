@@ -57,7 +57,7 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
     '#title' => t("KML File Field"),
     '#description' => t('The file field(s) and specific bundles that should be used to attach KML files. 
       Will only list file fields that only accept .kml files.'),
-    '#default_value' => variable_get('addressfield_staticmap_field_kml', ''),
+    '#default_value' => variable_get('addressfield_staticmap_field_kml', array()),
     '#options' => $kml_fields,
     '#multiple' => TRUE,
   );
