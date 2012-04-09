@@ -164,7 +164,7 @@ function _addressfield_static_map_render_google_maps_image($address, $settings) 
  */
 function addressfield_staticmap_theme() {
   return array(
-    'addressfield_staticmap' => array(
+    'addressfield_staticmap_google_map' => array(
       'variables' => array('address' => NULL, 'settings' => NULL, 'image' => NULL, 'kml_paths' => NULL),
       'template' => 'addressfield-staticmap-google-map',
     ),
@@ -200,7 +200,7 @@ function _addressfield_static_map_render_google_maps($address, $settings, $node)
     }
   }
   
-  $render = theme('addressfield_staticmap', array(
+  $render = theme('addressfield_staticmap_google_map', array(
     'address' => urldecode($address),
     'settings' => $settings,
     'image' => $image,
