@@ -150,8 +150,11 @@ function _addressfield_static_map_render_google_maps_image($address, $settings) 
   $image .= '<img class="static_google_map" src="' . $staticmap_url . '">';
   // Link to actual Google map
   if (variable_get('addressfield_staticmap_gmap_link_' . $index, FALSE)) {
+    $target = variable_get('addressfield_staticmap_gmap_link_target_' . $index, '');
+    $target = empty($target) ? '' : ' target="' . $target . '"';
+    
     $image = '<a title="' . t("Go to Google map of this location") .
-      '" href="' . $link . '">' . $image . '</a>';
+      '"' . $target . 'href="' . $link . '">' . $image . '</a>';
   }
   return $image;
 }

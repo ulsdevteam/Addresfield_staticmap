@@ -109,6 +109,17 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
       '#description' => t('Check this option to link the static image to a Google map.'),
       '#default_value' => variable_get('addressfield_staticmap_gmap_link_' . $i, FALSE),
     );
+    $form[$block]['addressfield_staticmap_gmap_link_target_' . $i] = array(
+      '#type' => 'select',
+      '#title' => t("Link Target"),
+      '#description' => t('The setting for the link.'),
+      '#default_value' => variable_get('addressfield_staticmap_gmap_link_target_' . $i, ''),
+      '#options' => array(
+        '' => t('Default (no target attribute)'),
+        '_top' => t('Open link in window root'),
+        '_blank' => t('Open link in new window'),
+      ),
+    );
     $form[$block]['addressfield_staticmap_gmap_icon_url_' . $i] = array(
       '#type' => 'textfield',
       '#title' => t("Custom Google Map Icon URL"),
