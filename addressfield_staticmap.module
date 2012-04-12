@@ -132,31 +132,32 @@ function addressfield_staticmap_block_view($delta = '') {
  * Render static Google Map image for a specific address
  */
 function _addressfield_static_map_render_google_maps_image($address, $settings) {
-  $staticmap_url = "http://maps.googleapis.com/maps/api/staticmap?center=" . $address . "&zoom=" . $settings['zoom'] . 
+  $settings['staticmap_url'] = "http://maps.googleapis.com/maps/api/staticmap?center=" . $address . "&zoom=" . $settings['zoom'] . 
     "&size=" . $settings['size'] . "&maptype=" . $settings['maptype'] . "&sensor=false&markers=" . 
     $settings['icon_url'] . "%7C" . $address;
   
   // Google Maps link
   $link = "http://maps.google.com/maps?q=" . $address;
-  $image = "";
   $index = $settings['index'];
+  $target = variable_get('addressfield_staticmap_gmap_link_target_' . $index, '');
   
   // Add 'Get Directions' text link
   if (variable_get('addressfield_staticmap_directions_link_' . $index)) {
     $link_text = check_plain(variable_get('addressfield_staticmap_directions_text_' . $index, 'Get Directions'));
-    $image = '<div>' . l($link_text, $link, array('attributes' => array('title' => $link_text))) . '</div>';
+    $settings['directions'] = l($link_text, $link, array('attributes' => array('title' => $link_text, 'target' => $target)));
   }
   
-  $image .= '<img class="static_google_map" src="' . $staticmap_url . '">';
   // Link to actual Google map
   if (variable_get('addressfield_staticmap_gmap_link_' . $index, FALSE)) {
-    $target = variable_get('addressfield_staticmap_gmap_link_target_' . $index, '');
-    $target = empty($target) ? '' : ' target="' . $target . '"';
-    
-    $image = '<a title="' . t("Go to Google map of this location") .
-      '"' . $target . 'href="' . $link . '">' . $image . '</a>';
+    $settings['target'] = empty($target) ? '' : ' target="' . $target . '"';
+    $settings['link'] = $link;
   }
-  return $image;
+  
+  $render = theme('addressfield_staticmap_static_map', array(
+    'address' => $address,
+    'settings' => $settings,
+  ));
+  return $render;
 }
 
 /**
@@ -170,6 +171,10 @@ function addressfield_staticmap_theme() {
     'addressfield_staticmap_google_map' => array(
       'variables' => array('address' => NULL, 'settings' => NULL, 'image' => NULL, 'kml_paths' => NULL),
       'template' => 'addressfield-staticmap-google-map',
+    ),
+    'addressfield_staticmap_static_map' => array(
+      'variables' => array('address' => NULL, 'settings' => NULL),
+      'template' => 'addressfield-staticmap-static-map',
     ),
   );
 }
