@@ -9,7 +9,7 @@
   
   var myOptions = {
     zoom: <?php print $settings['zoom']; ?>,
-    mapTypeId: google.maps.MapTypeId.<?php print strtoupper($settings['maptype']); ?>,
+    mapTypeId: google.maps.MapTypeId.<?php print strtoupper($settings['maptype']); ?>
     //disableDefaultUI: true,
     //scrollwheel: false,
     //draggable: false,
