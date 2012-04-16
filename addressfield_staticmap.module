@@ -129,6 +129,25 @@ function addressfield_staticmap_block_view($delta = '') {
 }
 
 /**
+ * Implements hook_theme().
+ * 
+ * Provides theming function used when a regular Google Map is rendered with
+ * a static image fallback.
+ */
+function addressfield_staticmap_theme() {
+  return array(
+    'addressfield_staticmap_google_map' => array(
+      'variables' => array('address' => NULL, 'settings' => NULL, 'image' => NULL, 'kml_paths' => NULL),
+      'template' => 'addressfield-staticmap-google-map',
+    ),
+    'addressfield_staticmap_static_map' => array(
+      'variables' => array('address' => NULL, 'settings' => NULL),
+      'template' => 'addressfield-staticmap-static-map',
+    ),
+  );
+}
+
+/**
  * Render static Google Map image for a specific address
  */
 function _addressfield_static_map_render_google_maps_image($address, $settings) {
@@ -160,24 +179,6 @@ function _addressfield_static_map_render_google_maps_image($address, $settings) 
   return $render;
 }
 
-/**
- * Implements hook_theme().
- * 
- * Provides theming function used when a regular Google Map is rendered with
- * a static image fallback.
- */
-function addressfield_staticmap_theme() {
-  return array(
-    'addressfield_staticmap_google_map' => array(
-      'variables' => array('address' => NULL, 'settings' => NULL, 'image' => NULL, 'kml_paths' => NULL),
-      'template' => 'addressfield-staticmap-google-map',
-    ),
-    'addressfield_staticmap_static_map' => array(
-      'variables' => array('address' => NULL, 'settings' => NULL),
-      'template' => 'addressfield-staticmap-static-map',
-    ),
-  );
-}
 /**
  * Render regular Google Map for a specific address
  */
