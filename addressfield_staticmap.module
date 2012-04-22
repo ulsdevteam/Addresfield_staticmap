@@ -78,10 +78,6 @@ function addressfield_staticmap_block_view($delta = '') {
       continue;
     }
     
-    // Set up some default arguments for addressfield_generate() 
-    $handlers = array('address' => 'address');
-    $context = array('mode' => 'render');
-    
     // Fetch configuration variables
     $api = variable_get('addressfield_staticmap_api_' . $index, 'google_maps');
     
@@ -99,12 +95,8 @@ function addressfield_staticmap_block_view($delta = '') {
       // becomes mandatory if you limit the list)
       if (isset($data_cleaned['country']) && sizeof($data_cleaned) <= 1) {
         continue;
-      }
-      
-      $address = drupal_render(addressfield_generate($data, $handlers, $context));
-      // Add some white space so that the address can still be parsed by Google Map's API
-      $address = preg_replace('/(<\/[^>]+?>)(<[^>\/][^>]*?>)/', '$1 $2', $address);
-      $address = urlencode(strip_tags($address));
+      }      
+      $address = addressfield_staticmap_clean_address($data);
       
       // Use Google Maps
       if ($api == 'google_maps') {
@@ -272,4 +264,20 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
     }
   }
   return $element;
+}
+
+/**
+ * Returns a Google Maps-friendly address from the Address Field format.
+ */
+function addressfield_staticmap_clean_address($address) {
+  // Set up some default arguments for addressfield_generate() 
+  $handlers = array('address' => 'address');
+  $context = array('mode' => 'render');
+  
+  $address = drupal_render(addressfield_generate($address, $handlers, $context));
+  // Add some white space so that the address can still be parsed by Google Map's API
+  $address = preg_replace('/(<\/[^>]+?>)(<[^>\/][^>]*?>)/', '$1 $2', $address);
+  $address = urlencode(strip_tags($address));
+  
+  return $address;
 }
