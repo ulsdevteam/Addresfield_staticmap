@@ -242,3 +242,34 @@ function _addressfield_static_map_render_mapquest_image($address, $settings) {
   
   return $image;
 }
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function addressfield_staticmap_field_formatter_info() {
+  return array(
+    'addressfield_staticmap' => array(
+      'label' => t('Address Field Static Map (use Block 1 settings)'),
+      'field types' => array('addressfield'),
+    ),
+    'addressfield_staticmap_alt' => array(
+      'label' => t('Address Field Static Map (use Block 2 settings)'),
+      'field types' => array('addressfield'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function addressfield_staticmap_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  
+  if (in_array($display['type'], array('addressfield_staticmap', 'addressfield_staticmap_alt'))) {
+    foreach ($items as $delta => $item) {
+      $block = addressfield_staticmap_block_view($display['type']);
+      $element[$delta]['#markup'] = $block['content'];
+    }
+  }
+  return $element;
+}
