@@ -1,5 +1,9 @@
 <?php $size = explode('x', $settings['size']); ?>
 
+<?php if (isset($settings['text_address'])): ?>
+  <div><?php print $settings['text_address']; ?></div>
+<?php endif; ?>
+
 <div id="map_canvas" style="width: <?php print $size[0]; ?>px; height: <?php print $size[1]; ?>px;">
   <noscript><?php print $image; ?></noscript>
 </div>

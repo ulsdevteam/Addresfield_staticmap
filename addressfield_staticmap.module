@@ -98,6 +98,11 @@ function addressfield_staticmap_block_view($delta = '') {
       }
       $address = addressfield_staticmap_clean_address($data);
 
+      // Display the address if the checkbox is set
+      if (variable_get('addressfield_staticmap_gmap_show_address_' . $index, FALSE)) {
+        $settings['text_address'] = _addressfield_staticmap_render_address($data);
+      }
+      
       // Use Google Maps
       if ($api == 'google_maps') {
         $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $index, '');
@@ -382,7 +387,7 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
 
   foreach ($items as $delta => $item) {
     $address = addressfield_staticmap_clean_address($item);
-
+    
     $settings = array(
       'zoom' => $display['settings']['zoom_level'],
       'size' => $display['settings']['map_size'],
@@ -391,6 +396,11 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
     );
 
     $api = variable_get('addressfield_staticmap_api_' . $settings['index'], 'google_maps');
+    
+    // Display the address if the checkbox is set
+    if (variable_get('addressfield_staticmap_gmap_show_address_' . $settings['index'], FALSE)) {
+      $settings['text_address'] = _addressfield_staticmap_render_address($item);
+    }
 
     // Use Google Maps.
     if ($api == 'google_maps') {
@@ -434,16 +444,23 @@ function addressfield_staticmap_mapsize_validate($element, &$form_state, $form) 
  * Returns a Google Maps-friendly address from the Address Field format.
  */
 function addressfield_staticmap_clean_address($address) {
-  // Set up some default arguments for addressfield_generate().
-  $handlers = array('address' => 'address');
-  $context = array('mode' => 'render');
-
-  $address = addressfield_generate($address, $handlers, $context);
-  $address = drupal_render($address);
+  $address = _addressfield_staticmap_render_address($address);
   // Add some commas so that the address can still be parsed by Google Map's API.
   $address = preg_replace('/(<\/[^>]+?>)(<[^>\/][^>]*?>)/', '$1, $2', $address);
   // Remove all HTML tags added by addressfield module.
   $address = strip_tags($address);
 
   return $address;
+}
+
+/**
+ * Helper function to render the address
+ */
+function _addressfield_staticmap_render_address($address) {
+  // Set up some default arguments for addressfield_generate().
+  $handlers = array('address' => 'address');
+  $context = array('mode' => 'render');
+
+  $address = addressfield_generate($address, $handlers, $context);
+  return drupal_render($address);
 }

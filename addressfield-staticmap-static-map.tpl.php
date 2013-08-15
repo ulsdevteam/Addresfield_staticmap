@@ -1,3 +1,6 @@
+<?php if (isset($settings['text_address'])): ?>
+  <div><?php print $settings['text_address']; ?></div>
+<?php endif; ?>
 <?php if (isset($settings['directions'])): ?>
   <div><?php print $settings['directions']; ?></div>
 <?php endif; ?>
