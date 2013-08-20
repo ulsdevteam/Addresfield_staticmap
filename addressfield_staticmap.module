@@ -386,6 +386,12 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
   $element = array();
 
   foreach ($items as $delta => $item) {
+    $data_cleaned = array_filter($item);
+    // If only the country is set, skip this (for some reason the country value
+    // becomes mandatory if you limit the list).
+    if (isset($data_cleaned['country']) && sizeof($data_cleaned) <= 1) {
+      continue;
+    }
     $address = addressfield_staticmap_clean_address($item);
     
     $settings = array(
