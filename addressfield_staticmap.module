@@ -1,4 +1,9 @@
 <?php
+/**
+ * @file
+ *
+ * Main file for the addressfield static map module.
+ */
 
 /**
  * Implements hook_permission().

@@ -68,7 +68,7 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
   foreach ($blocks as $i => $block) {
     $form[$block['key']] = array(
       '#type' => 'fieldset',
-      '#title' => $block['name'],
+      '#title' => check_plain($block['name']),
       '#collapsible' => TRUE,
       '#collapsed' => FALSE
     );
