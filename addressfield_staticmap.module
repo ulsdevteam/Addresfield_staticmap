@@ -418,7 +418,6 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       'index' => $display['settings']['advanced_settings_index'],
       'info_window' => $display['settings']['info_window'],
     );
-    dpm($settings, 'settings');
     
     $api = variable_get('addressfield_staticmap_api_' . $settings['index'], 'google_maps');
     
