@@ -121,6 +121,12 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
       '#description' => t('Check this option to display the address in readable, text format along with the map.'),
       '#default_value' => variable_get('addressfield_staticmap_gmap_show_address_' . $i, FALSE),
     );
+    $form[$block['key']]['addressfield_staticmap_gmap_show_info_window_' . $i] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Show the address in an info window'),
+      '#description' => t('Check this option to display the address in readable, text format in an info window when you click on the marker.'),
+      '#default_value' => variable_get('addressfield_staticmap_gmap_show_info_window_' . $i, FALSE),
+    );
     $form[$block['key']]['addressfield_staticmap_gmap_link_' . $i] = array(
       '#type' => 'checkbox',
       '#title' => t('Link to actual Google map'),
