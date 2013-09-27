@@ -24,8 +24,8 @@
   <?php if (isset($settings['info_window'])): ?>
     // info window
     var content = document.createElement('div');
-    $(content).addClass('info-window');
-    $(content).append('<?php print $settings['text_address']; ?>');
+    content.className = 'info-window';
+    content.innerHTML = '<?php print $settings['text_address']; ?>';
     
     var infowindow = new google.maps.InfoWindow({
       content: content

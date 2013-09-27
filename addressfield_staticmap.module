@@ -299,6 +299,7 @@ function addressfield_staticmap_field_formatter_info() {
         'map_style' => 'roadmap',
         'advanced_settings_index' => 0,
         'info_window' => 0,
+        'text_address' => 0,
       ),
     ),
   );
@@ -336,6 +337,12 @@ function addressfield_staticmap_field_formatter_settings_form($field, $instance,
       '#title' => t('Show the address in an info window'),
       '#type' => 'checkbox',      
       '#default_value' => $settings['info_window'],
+    );
+    
+    $form['text_address'] = array(
+      '#title' => t('Show the address in text format'),
+      '#type' => 'checkbox',      
+      '#default_value' => $settings['text_address'],
     );
     
     $form['map_style'] = array(
@@ -380,6 +387,8 @@ function addressfield_staticmap_field_formatter_settings_summary($field, $instan
     $summary .= '<br/>';
     $summary .= t('Map size: @map_size', array('@map_size' => $settings['map_size']));
     $summary .= '<br/>';
+    $summary .= t('Show the address in text format: @text_address', array('@text_address' => $settings['text_address'] ? t('Yes') : t('No')));
+    $summary .= '<br/>';
     $summary .= t('Show the address in an info window: @info_window', array('@info_window' => $settings['info_window'] ? t('Yes') : t('No')));
     $summary .= '<br/>';
     
@@ -417,12 +426,13 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       'maptype' => $display['settings']['map_style'],
       'index' => $display['settings']['advanced_settings_index'],
       'info_window' => $display['settings']['info_window'],
+      'text_address' => $display['settings']['text_address'],
     );
     
     $api = variable_get('addressfield_staticmap_api_' . $settings['index'], 'google_maps');
     
     // Display the address if the checkbox is set
-    if (variable_get('addressfield_staticmap_gmap_show_address_' . $settings['index'], FALSE)) {
+    if ($settings['text_address']) {
       $settings['text_address'] = _addressfield_staticmap_render_address($item);
     }
       
