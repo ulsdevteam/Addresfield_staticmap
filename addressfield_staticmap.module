@@ -499,6 +499,9 @@ function addressfield_staticmap_mapsize_validate($element, &$form_state, $form) 
  */
 function addressfield_staticmap_clean_address($address) {
   $address = _addressfield_staticmap_render_address($address);
+  // Remove newline from address
+  // prevents %0A in URL encode
+  $address = str_replace(array("\r\n", "\r", "\n"), ' ', $address);
   // Add some commas so that the address can still be parsed by Google Map's API.
   $address = preg_replace('/(<\/[^>]+?>)(<[^>\/][^>]*?>)/', '$1, $2', $address);
   // Remove all HTML tags added by addressfield module.
