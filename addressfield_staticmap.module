@@ -168,7 +168,7 @@ function addressfield_staticmap_theme() {
 function _addressfield_static_map_render_google_maps_image($address, $settings) {
   global $is_https;
 
-  $settings['staticmap_url'] = url('https://maps.googleapis.com/maps/api/staticmap', array(
+  $settings['staticmap_url'] = url('//maps.googleapis.com/maps/api/staticmap', array(
       'external' => TRUE,
       'https' => $is_https,
       'query' => array(
@@ -183,7 +183,7 @@ function _addressfield_static_map_render_google_maps_image($address, $settings) 
   );
 
   // Google Maps link.
-  $url = 'https://maps.google.com/maps';
+  $url = '//maps.google.com/maps';
   $options = array('external' => TRUE, 'https' => $is_https);
   $index = $settings['index'];
   $target = variable_get('addressfield_staticmap_gmap_link_target_' . $index, '');
