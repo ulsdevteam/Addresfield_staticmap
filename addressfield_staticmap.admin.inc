@@ -17,7 +17,7 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
   $fields = field_info_fields();
   foreach ($fields as $name => $field) {
     // Only display addressfields for this setting
-    if ($field['type'] == 'addressfield') {
+    if ($field['type'] == 'addressfield' || $field['type'] == 'location') {
       $address_fields[$name] = $name;
     }
 

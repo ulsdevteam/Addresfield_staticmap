@@ -298,7 +298,7 @@ function addressfield_staticmap_field_formatter_info() {
   return array(
     'addressfield_staticmap' => array(
       'label' => t('Address Field Static Map'),
-      'field types' => array('addressfield'),
+      'field types' => array('addressfield','location'),
       'settings' => array(
         'zoom_level' => 14,
         'map_size' => '400x400',
@@ -435,7 +435,7 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
     if (isset($data_cleaned['country']) && sizeof($data_cleaned) <= 1) {
       continue;
     }
-    $address = addressfield_staticmap_clean_address($item);
+    $address = addressfield_staticmap_clean_address($item, $field['type']);
     
     $settings = array(
       'zoom' => $display['settings']['zoom_level'],
@@ -497,16 +497,45 @@ function addressfield_staticmap_mapsize_validate($element, &$form_state, $form) 
 /**
  * Returns a Google Maps-friendly address from the Address Field format.
  */
-function addressfield_staticmap_clean_address($address) {
-  $address = _addressfield_staticmap_render_address($address);
-  // Remove newline from address
-  // prevents %0A in URL encode
-  $address = str_replace(array("\r\n", "\r", "\n"), ' ', $address);
-  // Add some commas so that the address can still be parsed by Google Map's API.
-  $address = preg_replace('/(<\/[^>]+?>)(<[^>\/][^>]*?>)/', '$1, $2', $address);
-  // Remove all HTML tags added by addressfield module.
-  $address = strip_tags($address);
+function addressfield_staticmap_clean_address($address, $field_type = 'addressfield') {
+  if ($field_type == 'addressfield') {
+    $address = _addressfield_staticmap_render_address($address);
+    // Remove newline from address
+    // prevents %0A in URL encode
+    $address = str_replace(["\r\n", "\r", "\n"], ' ', $address);
+    // Add some commas so that the address can still be parsed by Google Map's API.
+    $address = preg_replace('/(<\/[^>]+?>)(<[^>\/][^>]*?>)/', '$1, $2', $address);
+    // Remove all HTML tags added by addressfield module.
+    $address = strip_tags($address);
+  }
+  else {
+    if ($field_type == 'location') {
+      $location = $address;
+      $address = [];
+      $location_parts = [];
+      if (isset($location['latitude']) && $location['latitude'] != 0 && isset($location['longitude']) && $location['longitude'] != 0) {
+        $location_parts = ['latitude', 'longitude'];
+      }
+      else {
+        $location_parts = [
+          'street',
+          'additional',
+          'city',
+          'province',
+          'postal_code',
+          'country',
+        ];
+      }
 
+      foreach ($location_parts as $location_part) {
+        if (!empty($location[$location_part])) {
+          $address[] = $location[$location_part];
+        }
+      }
+
+      $address = implode(', ', $address);
+    }
+  }
   return $address;
 }
 
