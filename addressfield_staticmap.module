@@ -107,10 +107,10 @@ function addressfield_staticmap_block_view($delta = '') {
       if (variable_get('addressfield_staticmap_gmap_show_address_' . $index, FALSE)) {
         $settings['text_address'] = _addressfield_staticmap_render_address($data);
       }
-      
+
       // Display the info window if the checkbox is set
       $settings['info_window'] = variable_get('addressfield_staticmap_gmap_show_info_window_' . $index, FALSE);
-      
+
       // Use Google Maps
       if ($api == 'google_maps') {
         $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $index, '');
@@ -350,16 +350,16 @@ function addressfield_staticmap_field_formatter_settings_form($field, $instance,
 
     $form['info_window'] = array(
       '#title' => t('Show the address in an info window'),
-      '#type' => 'checkbox',      
+      '#type' => 'checkbox',
       '#default_value' => $settings['info_window'],
     );
-    
+
     $form['text_address'] = array(
       '#title' => t('Show the address in text format'),
-      '#type' => 'checkbox',      
+      '#type' => 'checkbox',
       '#default_value' => $settings['text_address'],
     );
-    
+
     $form['map_style'] = array(
       '#type' => 'select',
       '#title' => t('Map type'),
@@ -408,7 +408,7 @@ function addressfield_staticmap_field_formatter_settings_summary($field, $instan
     $summary .= '<br/>';
     $summary .= t('Show the address in an info window: @info_window', array('@info_window' => $settings['info_window'] ? t('Yes') : t('No')));
     $summary .= '<br/>';
-    
+
     // Show the type name and not only the key.
     $map_style = array(
       'roadmap' => t('Roadmap'),
@@ -436,7 +436,7 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       continue;
     }
     $address = addressfield_staticmap_clean_address($item, $field['type']);
-    
+
     $settings = array(
       'zoom' => $display['settings']['zoom_level'],
       'size' => $display['settings']['map_size'],
@@ -446,14 +446,14 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       'text_address' => $display['settings']['text_address'],
       'api_key' => $display['settings']['api_key'],
     );
-    
+
     $api = variable_get('addressfield_staticmap_api_' . $settings['index'], 'google_maps');
-    
+
     // Display the address if the checkbox is set
     if ($settings['text_address']) {
       $settings['text_address'] = _addressfield_staticmap_render_address($item);
     }
-      
+
     // Use Google Maps.
     if ($api == 'google_maps') {
       $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $settings['index'], '');
@@ -465,6 +465,7 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $settings['index'], '');
       $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
       $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $settings['index'], '');
+      $settings['id'] = $entity->nid;
       $node = NULL;
       $element[$delta]['#markup'] = _addressfield_static_map_render_google_maps($address, $settings, $node);
     }
