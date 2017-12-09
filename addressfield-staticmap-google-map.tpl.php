@@ -14,11 +14,10 @@ var staticMapGoogleMap<?php if(isset($settings['id'])) print '_'.$settings['id']
 
   var myOptions = {
   zoom: <?php print $settings['zoom']; ?>,
-    mapTypeId: google.maps.MapTypeId.<?php print strtoupper($settings['maptype']); ?>
-    //disableDefaultUI: true,
-    //scrollwheel: false,
-    //draggable: false,
-    //disableDoubleClickZoom: true
+    mapTypeId: google.maps.MapTypeId.<?php print strtoupper($settings['maptype']); ?>,
+    scrollwheel: <?php print $settings['scroll_lock'] ? 'false' : 'true'; ?>,
+    <?php if ($settings['scroll_lock']) print 'gestureHandling: "none",' ?>
+    zoomControl: <?php print $settings['scroll_lock'] ? 'false' : 'true'; ?>,
   }
   var map = new google.maps.Map(document.getElementById('map_canvas<?php if(isset($settings['id'])) print '-'.$settings['id']; ?>'), myOptions);
 

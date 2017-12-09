@@ -90,6 +90,7 @@ function addressfield_staticmap_block_view($delta = '') {
     $settings = array(
       'zoom' => variable_get('addressfield_staticmap_gmap_zoom_' . $index, 14),
       'size' => variable_get('addressfield_staticmap_gmap_size_' . $index, '400x400'),
+      'scroll_lock' => variable_get('addressfield_staticmap_scroll_lock_' . $index, FALSE),
       'maptype' => $maptype = variable_get('addressfield_staticmap_gmap_type_' . $index, 'roadmap'),
       'index' => $index,
     );
@@ -304,6 +305,7 @@ function addressfield_staticmap_field_formatter_info() {
         'map_size' => '400x400',
         'map_style' => 'roadmap',
         'advanced_settings_index' => 0,
+        'scroll_lock' => FALSE,
         'info_window' => 0,
         'text_address' => 0,
         'api_key' => '',
@@ -346,6 +348,12 @@ function addressfield_staticmap_field_formatter_settings_form($field, $instance,
       '#default_value' => $settings['map_size'],
       '#element_validate' => array('addressfield_staticmap_mapsize_validate'),
       '#required' => TRUE,
+    );
+
+    $form['scroll_lock'] = array(
+      '#title' => t('Prevent scrolling and zooming the map.'),
+      '#type' => 'checkbox',
+      '#default_value' => $settings['scroll_lock'],
     );
 
     $form['info_window'] = array(
@@ -404,6 +412,8 @@ function addressfield_staticmap_field_formatter_settings_summary($field, $instan
     $summary .= '<br/>';
     $summary .= t('Map size: @map_size', array('@map_size' => $settings['map_size']));
     $summary .= '<br/>';
+    $summary .= t('Prevent map zoom and scroll: @scroll_lock', array('@scroll_lock' => $settings['scroll_lock'] ? t('Yes') : t('No')));
+    $summary .= '<br/>';
     $summary .= t('Show the address in text format: @text_address', array('@text_address' => $settings['text_address'] ? t('Yes') : t('No')));
     $summary .= '<br/>';
     $summary .= t('Show the address in an info window: @info_window', array('@info_window' => $settings['info_window'] ? t('Yes') : t('No')));
@@ -442,6 +452,7 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       'size' => $display['settings']['map_size'],
       'maptype' => $display['settings']['map_style'],
       'index' => $display['settings']['advanced_settings_index'],
+      'scroll_lock' => $display['settings']['scroll_lock'],
       'info_window' => $display['settings']['info_window'],
       'text_address' => $display['settings']['text_address'],
       'api_key' => $display['settings']['api_key'],
