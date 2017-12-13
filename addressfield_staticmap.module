@@ -335,10 +335,11 @@ function addressfield_staticmap_field_formatter_settings_form($field, $instance,
 
     $form['zoom_level'] = array(
       '#title' => t('Zoom level'),
-      '#type' => 'select',
-      '#description' => t('The zoom level to use on the map. Must be between 1 and 16 (inclusive) for Mapquest, or any of the options for Google Mmaps.'),
+      '#type' => 'textfield',
+      '#description' => t('Must be between 0 and 21 for gmaps.'),
+      '#size' => 2,
       '#default_value' => $settings['zoom_level'],
-      '#options' => drupal_map_assoc(range(0, 21)),
+      '#element_validate' => array('element_validate_integer_positive'),
       '#required' => TRUE,
     );
 
