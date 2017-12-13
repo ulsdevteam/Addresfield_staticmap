@@ -89,11 +89,12 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
         'mapquest' => t('Mapquest'),
       ),
     );
-      $form[$block['key']]['addressfield_staticmap_gmap_zoom_' . $i] = array(
-      '#type' => 'textfield',
+    $form[$block['key']]['addressfield_staticmap_gmap_zoom_' . $i] = array(
+      '#type' => 'select',
       '#title' => t('Zoom level'),
-      '#description' => t('The resolution of the zoom level to use on the map. Can be between 0 and 21 for Google Static Maps API, and 1 and 16 for Mapquest. Default is 14.'),
+      '#description' => t('The zoom level to use on the map. Can be any of the options for Google Static Maps API or between 1 and 16 (inclusive) for Mapquest. The default is 14.'),
       '#default_value' => variable_get('addressfield_staticmap_gmap_zoom_' . $i, 14),
+      '#options' => array('auto' => t('Auto')) + drupal_map_assoc(range(0, 21)),
       '#required' => TRUE,
     );
     $form[$block['key']]['addressfield_staticmap_gmap_size_' . $i] = array(
@@ -187,14 +188,14 @@ function addressfield_staticmap_admin_form_validate($form, &$form_state) {
     $zoom = $form_state['values']['addressfield_staticmap_gmap_zoom_' . $index];
     $api = $form_state['values']['addressfield_staticmap_api_' . $index];
     if ($api == 'google_maps') {
-      if (empty($zoom) || $zoom < 0 || $zoom > 21 || !is_numeric($zoom)) {
-        form_set_error('addressfield_staticmap_gmap_zoom_' . $index, t('Invalid zoom level. Please enter a value from 0 and 21.'));
+      if (!in_array($zoom, array('auto' => t('Auto')) + drupal_map_assoc(range(0, 21)))) {
+        form_set_error('addressfield_staticmap_gmap_zoom_' . $index, t('Invalid zoom level. Please select auto or a value between 0 and 21 inclusive'));
         return;
       }
     }
     elseif ($api == 'mapquest') {
-      if (empty($zoom) || $zoom < 1 || $zoom > 16 || !is_numeric($zoom)) {
-        form_set_error('addressfield_staticmap_gmap_zoom_' . $index, t('Invalid zoom level. Please enter a value from 1 and 16.'));
+      if (!in_array($zoom, drupal_map_assoc(range(1, 16)))) {
+        form_set_error('addressfield_staticmap_gmap_zoom_' . $index, t('Invalid zoom level. Please select a value between 1 and 16 inclusive.'));
         return;
       }
     }

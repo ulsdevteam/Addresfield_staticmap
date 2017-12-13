@@ -13,7 +13,7 @@ var staticMapGoogleMap<?php if(isset($settings['id'])) print '_'.$settings['id']
   var address = '<?php print $address; ?>';
 
   var myOptions = {
-  zoom: <?php print $settings['zoom']; ?>,
+  <?php if ($settings['zoom'] !== 'auto'): ?>zoom: <?php print $settings['zoom']; ?>,<?php endif ?>
     mapTypeId: google.maps.MapTypeId.<?php print strtoupper($settings['maptype']); ?>,
     scrollwheel: <?php print $settings['scroll_lock'] ? 'false' : 'true'; ?>,
     <?php if ($settings['scroll_lock']) print 'gestureHandling: "none",' ?>

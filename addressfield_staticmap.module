@@ -169,19 +169,24 @@ function addressfield_staticmap_theme() {
 function _addressfield_static_map_render_google_maps_image($address, $settings, $node) {
   global $is_https;
 
-  $settings['staticmap_url'] = url('//maps.googleapis.com/maps/api/staticmap', array(
-      'external' => TRUE,
-      'https' => $is_https,
-      'query' => array(
-        'key' => $settings['api_key'],
-        'center' => $address,
-        'zoom' => $settings['zoom'],
-        'size' => $settings['size'],
-        'maptype' => $settings['maptype'],
-        'markers' => implode('|', array(url($settings['icon_url'], array('external' => TRUE)), $address)),
-      ),
-    )
+  $settings = array(
+    'external' => TRUE,
+    'https' => $is_https,
+    'query' => array(
+      'key' => $settings['api_key'],
+      'center' => $address,
+      'zoom' => $settings['zoom'],
+      'size' => $settings['size'],
+      'maptype' => $settings['maptype'],
+      'markers' => implode('|', array(url($settings['icon_url'], array('external' => TRUE)), $address)),
+    ),
   );
+
+  if ($settings['query']['zoom'] == 'auto') {
+    unset($settings['query']['zoom']);
+  }
+
+  $settings['staticmap_url'] = url('//maps.googleapis.com/maps/api/staticmap', $settings);
 
   // Google Maps link.
   $url = '//maps.google.com/maps';
@@ -335,11 +340,10 @@ function addressfield_staticmap_field_formatter_settings_form($field, $instance,
 
     $form['zoom_level'] = array(
       '#title' => t('Zoom level'),
-      '#type' => 'textfield',
-      '#description' => t('Must be between 0 and 21 for gmaps.'),
-      '#size' => 2,
+      '#type' => 'select',
+      '#description' => t('The zoom level to use on the map. Must be between 1 and 16 (inclusive) for Mapquest, or any of the options for Google Mmaps.'),
       '#default_value' => $settings['zoom_level'],
-      '#element_validate' => array('element_validate_integer_positive'),
+      '#options' => array('auto' => t('Auto')) + drupal_map_assoc(range(0, 21)),
       '#required' => TRUE,
     );
 
