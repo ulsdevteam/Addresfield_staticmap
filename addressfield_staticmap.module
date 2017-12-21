@@ -169,7 +169,7 @@ function addressfield_staticmap_theme() {
 function _addressfield_static_map_render_google_maps_image($address, $settings, $node) {
   global $is_https;
 
-  $settings = array(
+  $url_args = array(
     'external' => TRUE,
     'https' => $is_https,
     'query' => array(
@@ -182,11 +182,11 @@ function _addressfield_static_map_render_google_maps_image($address, $settings, 
     ),
   );
 
-  if ($settings['query']['zoom'] == 'auto') {
-    unset($settings['query']['zoom']);
+  if ($url_args['query']['zoom'] == 'auto') {
+    unset($url_args['query']['zoom']);
   }
 
-  $settings['staticmap_url'] = url('//maps.googleapis.com/maps/api/staticmap', $settings);
+  $settings['staticmap_url'] = url('//maps.googleapis.com/maps/api/staticmap', $url_args);
 
   // Google Maps link.
   $url = '//maps.google.com/maps';
