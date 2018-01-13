@@ -68,8 +68,8 @@ function addressfield_staticmap_block_view($delta = '') {
     return $block;
   }
 
-  $node = menu_get_object();
-  if (empty($node)) {
+  $entity = menu_get_object();
+  if (empty($entity)) {
     return $block;
   }
 
@@ -78,7 +78,7 @@ function addressfield_staticmap_block_view($delta = '') {
 
   // Do this for each of the enabled address fields.
   foreach ($field_names as $field_name) {
-    $fields = field_get_items('node', $node, $field_name, $node->language);
+    $fields = field_get_items('entity', $entity, $field_name, $entity->language);
     if (empty($fields)) {
       continue;
     }
@@ -117,13 +117,13 @@ function addressfield_staticmap_block_view($delta = '') {
         $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $index, '');
         $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
         $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $index, '');
-        $block['content'] .= _addressfield_static_map_render_google_maps_image($address, $settings, $node);
+        $block['content'] .= _addressfield_static_map_render_google_maps_image($address, $settings, $entity);
       }
       elseif ($api == 'google_maps_api') {
         $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $index, '');
         $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
         $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $index, '');
-        $block['content'] .= _addressfield_static_map_render_google_maps($address, $settings, $node);
+        $block['content'] .= _addressfield_static_map_render_google_maps($address, $settings, $entity);
       }
       // Use Mapquest
       elseif ($api == 'mapquest') {
@@ -166,7 +166,7 @@ function addressfield_staticmap_theme() {
 /**
  * Render static Google Map image for a specific address.
  */
-function _addressfield_static_map_render_google_maps_image($address, $settings, $node) {
+function _addressfield_static_map_render_google_maps_image($address, $settings, $entity) {
   global $is_https;
 
   $url_args = array(
@@ -212,7 +212,7 @@ function _addressfield_static_map_render_google_maps_image($address, $settings, 
   $render = theme('addressfield_staticmap_static_map', array(
     'address' => $address,
     'settings' => $settings,
-    'node' => $node,
+    'entity' => $entity,
   ));
 
   return $render;
@@ -221,28 +221,28 @@ function _addressfield_static_map_render_google_maps_image($address, $settings, 
 /**
  * Render regular Google Map for a specific address.
  */
-function _addressfield_static_map_render_google_maps($address, $settings, $node) {
+function _addressfield_static_map_render_google_maps($address, $settings, $entity) {
   $maps_url = '//maps.googleapis.com/maps/api/js';
   if (!empty($settings['api_key'])) {
     $maps_url .= '?key=' . $settings['api_key'];
   }
   drupal_add_js($maps_url, 'external');
   drupal_add_css(drupal_get_path('module', 'addressfield_staticmap') . '/addressfield_staticmap.css');
-  $image = _addressfield_static_map_render_google_maps_image($address, $settings, $node);
+  $image = _addressfield_static_map_render_google_maps_image($address, $settings, $entity);
   $kml_paths = array();
 
   // Additional processing to attach optional KML file(s).
   $kml_field_names = array_filter(variable_get('addressfield_staticmap_field_kml', array()));
-  if (!empty($kml_field_names) && isset($node)) {
+  if (!empty($kml_field_names) && isset($entity)) {
 
     foreach ($kml_field_names as $kml_field) {
       $kml_field = explode('|', $kml_field);
 
       // Check to see if the valid field settings are for this bundle.
-      if ($node->type != $kml_field[0]) {
+      if ($entity->type != $kml_field[0]) {
         continue;
       }
-      $kml_files = field_get_items('node', $node, $kml_field[1], $node->language);
+      $kml_files = field_get_items('entity', $entity, $kml_field[1], $entity->language);
       if (empty($kml_files)) {
         continue;
       }
@@ -257,7 +257,7 @@ function _addressfield_static_map_render_google_maps($address, $settings, $node)
     'settings' => $settings,
     'image' => $image,
     'kml_paths' => $kml_paths,
-    'node' => $node,
+    'entity' => $entity,
   ));
 
   return $render;
@@ -471,6 +471,8 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       $settings['text_address'] = _addressfield_staticmap_render_address($item);
     }
 
+    $entity_id_field = addressfield_entity_id_from_entity_type($entity_type);
+
     // Use Google Maps.
     if ($api == 'google_maps') {
       $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $settings['index'], '');
@@ -482,8 +484,8 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $settings['index'], '');
       $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
       $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $settings['index'], '');
-      $settings['id'] = $entity->nid;
-      $node = NULL;
+      $settings['id'] = $entity->{$entity_id_field};
+      $entity = NULL;
       $element[$delta]['#markup'] = _addressfield_static_map_render_google_maps($address, $settings, $entity);
     }
     // Use Mapquest.
@@ -529,20 +531,20 @@ function addressfield_staticmap_clean_address($address, $field_type = 'addressfi
   else {
     if ($field_type == 'location') {
       $location = $address;
-      $address = [];
-      $location_parts = [];
+      $address = array();
+      $location_parts = array();
       if (isset($location['latitude']) && $location['latitude'] != 0 && isset($location['longitude']) && $location['longitude'] != 0) {
-        $location_parts = ['latitude', 'longitude'];
+        $location_parts = array('latitude', 'longitude');
       }
       else {
-        $location_parts = [
+        $location_parts = array(
           'street',
           'additional',
           'city',
           'province',
           'postal_code',
           'country',
-        ];
+        );
       }
 
       foreach ($location_parts as $location_part) {
@@ -557,6 +559,18 @@ function addressfield_staticmap_clean_address($address, $field_type = 'addressfi
   return $address;
 }
 
+function addressfield_entity_id_from_entity_type($entity_type) {
+
+  switch ($entity_type) {
+    case 'block_type':
+      return 'bid';
+    case 'node':
+      return 'nid';
+  }
+
+  drupal_set_message("The addressfield_staticmap needs to be taught how to handle ${entity_type} entities. Please open an issue on Drupal.org.");
+  return null;
+}
 /**
  * Helper function to render the address
  */
@@ -575,13 +589,18 @@ function _addressfield_staticmap_render_address($address) {
 function addressfield_staticmap_preprocess(&$variables, $hook) {
 
   if ($hook !== 'addressfield_staticmap_static_map' ||
-      is_null($variables['node'])) {
+      is_null($variables['entity'])) {
     return;
   }
 
-  $variables['theme_hook_suggestions'] = array_merge(
-    [
-      'addressfield_staticmap_static_map__' . $variables['node']->type,
-      'addressfield_staticmap_static_map__node_' . $variables['node']->nid,
-    ], $variables['theme_hook_suggestions']);
+  $eid_field = addressfield_entity_id_from_entity_type($variables['entity']->type);
+
+  if ($eid_field) {
+
+    $variables['theme_hook_suggestions'] = array_merge(
+      array(
+        'addressfield_staticmap_static_map__' . $variables['entity']->type,
+        'addressfield_staticmap_static_map__entity_' . $variables['entity']->{$eid_field},
+      ), $variables['theme_hook_suggestions']);
+  }
 }

@@ -25,13 +25,16 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
     if ($field['type'] != 'file') {
       continue;
     }
-    if (!isset($field['bundles']['node'])) {
-      continue;
-    }
-    foreach ($field['bundles']['node'] as $bundle_name) {
-      $field_instance = field_info_instance('node', $name, $bundle_name);
-      if ($field_instance['settings']['file_extensions'] == 'kml') {
-        $kml_fields[$bundle_name . '|' . $name] = $name . ' (' . $bundle_name . ')';
+
+    foreach ($field['entity_types'] as $index => $entity_type) {
+      if (!isset($field['bundles'][$entity_type])) {
+        continue;
+      }
+      foreach ($field['bundles'][$entity_type] as $bundle_name) {
+        $field_instance = field_info_instance($entity_type, $name, $bundle_name);
+        if ($field_instance['settings']['file_extensions'] == 'kml') {
+          $kml_fields[$bundle_name . '|' . $name] = $name . ' (' . $bundle_name . ')';
+        }
       }
     }
   }
