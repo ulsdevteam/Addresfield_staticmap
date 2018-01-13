@@ -562,7 +562,7 @@ function addressfield_staticmap_clean_address($address, $field_type = 'addressfi
 function addressfield_entity_id_from_entity_type($entity_type) {
 
   switch ($entity_type) {
-    case 'block_type':
+    case 'bean':
       return 'bid';
     case 'node':
       return 'nid';
