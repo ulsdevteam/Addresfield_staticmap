@@ -117,7 +117,7 @@ function addressfield_staticmap_block_view($delta = '') {
         $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $index, '');
         $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
         $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $index, '');
-        $block['content'] .= _addressfield_static_map_render_google_maps_image($address, $settings);
+        $block['content'] .= _addressfield_static_map_render_google_maps_image($address, $settings, $node);
       }
       elseif ($api == 'google_maps_api') {
         $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $index, '');
