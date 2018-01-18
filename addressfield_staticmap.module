@@ -471,7 +471,8 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       $settings['text_address'] = _addressfield_staticmap_render_address($item);
     }
 
-    $entity_id_field = addressfield_entity_id_from_entity_type($entity_type);
+    $entity->entity_type = $entity_type;
+    $entity_id_field = addressfield_entity_id_from_entity_type($entity);
 
     // Use Google Maps.
     if ($api == 'google_maps') {
@@ -559,16 +560,16 @@ function addressfield_staticmap_clean_address($address, $field_type = 'addressfi
   return $address;
 }
 
-function addressfield_entity_id_from_entity_type($entity_type) {
+function addressfield_entity_id_from_entity_type($entity) {
 
-  switch ($entity_type) {
+  switch ($entity->entity_type) {
     case 'bean':
       return 'bid';
     case 'node':
       return 'nid';
   }
 
-  drupal_set_message("The addressfield_staticmap needs to be taught how to handle ${entity_type} entities. Please open an issue on Drupal.org.");
+  drupal_set_message("The addressfield_staticmap needs to be taught how to handle {$entity->entity_type} entities. Please open an issue on Drupal.org.");
   return null;
 }
 /**
@@ -593,7 +594,7 @@ function addressfield_staticmap_preprocess(&$variables, $hook) {
     return;
   }
 
-  $eid_field = addressfield_entity_id_from_entity_type($variables['entity']->type);
+  $eid_field = addressfield_entity_id_from_entity_type($variables['entity']);
 
   if ($eid_field) {
 
