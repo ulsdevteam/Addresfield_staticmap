@@ -1,7 +1,7 @@
 <?php
+
 /**
  * @file
- *
  * Contains admin page code for the addressfield static map module.
  */
 
@@ -16,12 +16,12 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
 
   $fields = field_info_fields();
   foreach ($fields as $name => $field) {
-    // Only display addressfields for this setting
+    // Only display addressfields for this setting.
     if ($field['type'] == 'addressfield' || $field['type'] == 'location') {
       $address_fields[$name] = $name;
     }
 
-    // Only display file fields that only accept KML uploads
+    // Only display file fields that only accept KML uploads.
     if ($field['type'] != 'file') {
       continue;
     }
@@ -73,7 +73,7 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
       '#type' => 'fieldset',
       '#title' => check_plain($block['name']),
       '#collapsible' => TRUE,
-      '#collapsed' => FALSE
+      '#collapsed' => FALSE,
     );
     $form[$block['key']]['addressfield_staticmap_api_key_' . $i] = array(
       '#type' => 'textfield',
@@ -185,8 +185,13 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
 
 /**
  * Admin form validation callback.
+ *
+ * @param array $form
+ *   The built form.
+ * @param array &$form_state
+ *   The form state.
  */
-function addressfield_staticmap_admin_form_validate($form, &$form_state) {
+function addressfield_staticmap_admin_form_validate(array $form, array &$form_state) {
   for ($index = 0; $index <= 1; $index++) {
     $zoom = $form_state['values']['addressfield_staticmap_gmap_zoom_' . $index];
     $api = $form_state['values']['addressfield_staticmap_api_' . $index];
@@ -215,7 +220,7 @@ function addressfield_staticmap_admin_form_validate($form, &$form_state) {
       return;
     }
 
-    // Mapquest requires an API key
+    // Mapquest requires an API key.
     $api_key = $form_state['values']['addressfield_staticmap_api_key_' . $index];
     if ($api == 'mapquest' && empty($api_key)) {
       form_set_error('addressfield_staticmap_api_key_' . $index, t('Mapquest requires an API key.'));
