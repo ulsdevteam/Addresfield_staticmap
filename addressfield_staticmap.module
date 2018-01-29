@@ -335,7 +335,6 @@ function addressfield_staticmap_field_formatter_settings_form($field, $instance,
       '#type' => 'textfield',
       '#size' => 40,
       '#default_value' => $settings['api_key'],
-      '#required' => TRUE,
     );
 
     $form['zoom_level'] = array(
