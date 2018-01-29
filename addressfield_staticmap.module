@@ -567,6 +567,8 @@ function addressfield_entity_id_from_entity_type($entity) {
       return 'bid';
     case 'node':
       return 'nid';
+    case 'profile2':
+      return 'pid';
   }
 
   drupal_set_message("The addressfield_staticmap needs to be taught how to handle {$entity->entity_type} entities. Please open an issue on Drupal.org.");
