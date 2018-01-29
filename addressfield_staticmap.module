@@ -485,7 +485,6 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
       $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $settings['index'], '');
       $settings['id'] = $entity->{$entity_id_field};
-      $entity = NULL;
       $element[$delta]['#markup'] = _addressfield_static_map_render_google_maps($address, $settings, $entity);
     }
     // Use Mapquest.
