@@ -78,6 +78,10 @@ function addressfield_staticmap_block_view($delta = '') {
 
   // Do this for each of the enabled address fields.
   foreach ($field_names as $field_name) {
+    if (empty($entity->entity_type)) {
+      continue;
+    }
+
     $fields = field_get_items($entity->entity_type, $entity, $field_name, $entity->language);
     if (empty($fields)) {
       continue;
@@ -494,7 +498,6 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       $settings['text_address'] = _addressfield_staticmap_render_address($item);
     }
 
-    $entity->entity_type = $entity_type;
     $entity_id_field = addressfield_entity_id_from_entity_type($entity);
 
     // Use Google Maps.
@@ -595,6 +598,18 @@ function addressfield_staticmap_clean_address(array $address, $field_type = 'add
     }
   }
   return $address;
+}
+
+/**
+ * Implements hook_entity_load().
+ */
+function addressfield_staticmap_entity_load($entities, $type) {
+  // Add an additional property to entities as they are loaded so we know what the heck it actually is.
+  // This has spawned out of Drupal.org issue #1042822.
+  // Based on code from the entity_base_type module.
+  foreach ($entities as $entity) {
+    $entity->entity_type = $type;
+  }
 }
 
 /**
