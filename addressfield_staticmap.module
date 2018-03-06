@@ -78,7 +78,7 @@ function addressfield_staticmap_block_view($delta = '') {
 
   // Do this for each of the enabled address fields.
   foreach ($field_names as $field_name) {
-    $fields = field_get_items('entity', $entity, $field_name, $entity->language);
+    $fields = field_get_items($entity->entity_type, $entity, $field_name, $entity->language);
     if (empty($fields)) {
       continue;
     }
