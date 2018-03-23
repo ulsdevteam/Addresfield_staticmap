@@ -657,11 +657,14 @@ function addressfield_staticmap_preprocess(&$variables, $hook) {
   $eid_field = addressfield_entity_id_from_entity_type($variables['entity']);
 
   if ($eid_field) {
+    $hooks = array(
+      'addressfield_staticmap_static_map__' . $variables['entity']->entity_type,
+    );
+    if (isset($variables['entity']->type)) {
+      $hooks[] = 'addressfield_staticmap_static_map__' . $variables['entity']->entity_type . '__' . $variables['entity']->type;
+    }
+    $hooks[] = 'addressfield_staticmap_static_map__entity_' . $variables['entity']->{$eid_field};
 
-    $variables['theme_hook_suggestions'] = array_merge(
-      array(
-        'addressfield_staticmap_static_map__' . $variables['entity']->type,
-        'addressfield_staticmap_static_map__entity_' . $variables['entity']->{$eid_field},
-      ), $variables['theme_hook_suggestions']);
+    $variables['theme_hook_suggestions'] = array_merge($hooks, $variables['theme_hook_suggestions']);
   }
 }
