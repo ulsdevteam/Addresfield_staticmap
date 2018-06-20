@@ -119,6 +119,17 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
         'hybrid' => t('Hybrid'),
       ),
     );
+    $form[$block['key']]['addressfield_staticmap_scale_' . $i] = array(
+      '#type' => 'select',
+      '#title' => t('Scale'),
+      '#description' => t('The scale parameter for the image (retina). 4 will only work on Google if you have a premium subscription.'),
+      '#default_value' => variable_get('addressfield_staticmap_scale_' . $i, 1),
+      '#options' => array(
+        1 => t('1x'),
+        2 => t('2x'),
+        4 => t('4x'),
+      ),
+    );
     $form[$block['key']]['addressfield_staticmap_scroll_lock_' . $i] = array(
       '#type' => 'checkbox',
       '#default_value' => variable_get('addressfield_staticmap_scroll_lock_' . $i, FALSE),

@@ -96,6 +96,7 @@ function addressfield_staticmap_block_view($delta = '') {
       'size' => variable_get('addressfield_staticmap_gmap_size_' . $index, '400x400'),
       'scroll_lock' => variable_get('addressfield_staticmap_scroll_lock_' . $index, FALSE),
       'maptype' => $maptype = variable_get('addressfield_staticmap_gmap_type_' . $index, 'roadmap'),
+      'scale' => variable_get('addressfield_staticmap_scale_' . $index, 1),
       'index' => $index,
     );
 
@@ -191,6 +192,7 @@ function _addressfield_static_map_render_google_maps_image($address, array $sett
       'center' => $address,
       'zoom' => $settings['zoom'],
       'size' => $settings['size'],
+      'scale' => $settings['scale'],
       'maptype' => $settings['maptype'],
       'markers' => implode('|',
         array(
@@ -322,6 +324,7 @@ function _addressfield_static_map_render_mapquest_image($address, $settings) {
         'size' => $settings['size'],
         'type' => $settings['maptype'],
         'zoom' => $settings['zoom'],
+        'scale' => $settings['scale'],
         'imagetype' => 'jpeg',
         'showicon' => 'green-1',
       ),
@@ -343,6 +346,7 @@ function addressfield_staticmap_field_formatter_info() {
         'zoom_level' => 14,
         'map_size' => '400x400',
         'map_style' => 'roadmap',
+        'scale' => 1,
         'advanced_settings_index' => 0,
         'scroll_lock' => FALSE,
         'info_window' => 0,
@@ -418,6 +422,18 @@ function addressfield_staticmap_field_formatter_settings_form($field, $instance,
       ),
     );
 
+    $form['scale'] = array(
+      '#type' => 'select',
+      '#title' => t('Scale'),
+      '#description' => t('The scale parameter for the image (retina). 4 will only work on Google if you have a premium subscription.'),
+      '#default_value' => $settings['scale'],
+      '#options' => array(
+        1 => t('1x'),
+        2 => t('2x'),
+        4 => t('4x'),
+      ),
+    );
+
     $form['advanced_settings_index'] = array(
       '#type' => 'select',
       '#title' => t('Advanced settings block'),
@@ -455,7 +471,8 @@ function addressfield_staticmap_field_formatter_settings_summary($field, $instan
     $summary .= '<br/>';
     $summary .= t('Show the address in an info window: @info_window', array('@info_window' => $settings['info_window'] ? t('Yes') : t('No')));
     $summary .= '<br/>';
-
+    $summary .= t('Scale: @scale', array('@scale' => isset($settings['scale']) ? $settings['scale'] : 1));
+    $summary .= '<br/>';
     // Show the type name and not only the key.
     $map_style = array(
       'roadmap' => t('Roadmap'),
@@ -488,6 +505,7 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       'zoom' => $display['settings']['zoom_level'],
       'size' => $display['settings']['map_size'],
       'maptype' => $display['settings']['map_style'],
+      'scale' => $display['settings']['scale'] ? $display['settings']['scale'] : 1,
       'index' => $display['settings']['advanced_settings_index'],
       'scroll_lock' => $display['settings']['scroll_lock'],
       'info_window' => $display['settings']['info_window'],
