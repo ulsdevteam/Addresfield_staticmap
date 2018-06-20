@@ -95,7 +95,7 @@ function addressfield_staticmap_block_view($delta = '') {
       'zoom' => variable_get('addressfield_staticmap_gmap_zoom_' . $index, 14),
       'size' => variable_get('addressfield_staticmap_gmap_size_' . $index, '400x400'),
       'scroll_lock' => variable_get('addressfield_staticmap_scroll_lock_' . $index, FALSE),
-      'maptype' => $maptype = variable_get('addressfield_staticmap_gmap_type_' . $index, 'roadmap'),
+      'maptype' => variable_get('addressfield_staticmap_gmap_type_' . $index, 'roadmap'),
       'scale' => variable_get('addressfield_staticmap_scale_' . $index, 1),
       'index' => $index,
     );
