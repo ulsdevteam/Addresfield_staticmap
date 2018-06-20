@@ -121,18 +121,27 @@ function addressfield_staticmap_block_view($delta = '') {
       if ($api == 'google_maps') {
         $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $index, '');
         $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
+        $settings['premier'] = variable_get('addressfield_staticmap_premier_' . $index, '');
         $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $index, '');
+        $settings['client_id'] = variable_get('addressfield_staticmap_premium_client_id_' . $index, '');
+        $settings['crypto_key'] = variable_get('addressfield_staticmap_premium_crypto_key_' . $index, '');
+
         $block['content'] .= _addressfield_static_map_render_google_maps_image($address, $settings, $entity);
       }
       elseif ($api == 'google_maps_api') {
         $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $index, '');
         $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
+        $settings['premier'] = variable_get('addressfield_staticmap_premier_' . $index, '');
         $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $index, '');
+        $settings['client_id'] = variable_get('addressfield_staticmap_premium_client_id_' . $index, '');
+        $settings['crypto_key'] = variable_get('addressfield_staticmap_premium_crypto_key_' . $index, '');
+
         $block['content'] .= _addressfield_static_map_render_google_maps($address, $settings, $entity);
       }
       // Use Mapquest.
       elseif ($api == 'mapquest') {
         $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $index, '');
+
         $block['content'] .= _addressfield_static_map_render_mapquest_image($address, $settings);
       }
     }
@@ -188,7 +197,6 @@ function _addressfield_static_map_render_google_maps_image($address, array $sett
     'external' => TRUE,
     'https' => $is_https,
     'query' => array(
-      'key' => $settings['api_key'],
       'center' => $address,
       'zoom' => $settings['zoom'],
       'size' => $settings['size'],
@@ -207,7 +215,23 @@ function _addressfield_static_map_render_google_maps_image($address, array $sett
     unset($url_args['query']['zoom']);
   }
 
+  // Check for Google Maps API key vs Premium Plan via Client ID & Signature.
+  if (isset($settings['premier']) && $settings['premier']) {
+    $url_args['query']['client'] = $settings['client_id'];
+  }
+  else {
+    $url_args['query']['key'] = $settings['api_key'];
+  }
+
   $settings['staticmap_url'] = url('//maps.googleapis.com/maps/api/staticmap', $url_args);
+
+  if (isset($settings['premier']) && $settings['premier']) {
+    $data = str_replace('//maps.googleapis.com', '', $settings['staticmap_url']);
+    $signature = hash_hmac('sha1', $data, base64_decode(strtr($settings['crypto_key'], '-_', '+/')), true);
+    $signature = strtr(base64_encode($signature), '+/', '-_');
+
+    $settings['staticmap_url'] .= '&signature=' . $signature;
+  }
 
   // Google Maps link.
   $url = '//maps.google.com/maps';
@@ -256,10 +280,24 @@ function _addressfield_static_map_render_google_maps_image($address, array $sett
  *   Rendered Google map.
  */
 function _addressfield_static_map_render_google_maps($address, array $settings, $entity) {
-  $maps_url = '//maps.googleapis.com/maps/api/js';
-  if (!empty($settings['api_key'])) {
-    $maps_url .= '?key=' . $settings['api_key'];
+  // Check for Google Maps API key vs Premium Plan via Client ID & Signature.
+  if (isset($settings['premier']) && $settings['premier']) {
+    $url_args['query']['client'] = $settings['client_id'];
   }
+  else {
+    $url_args['query']['key'] = $settings['api_key'];
+  }
+
+  $maps_url = url('//maps.googleapis.com/maps/api/js', $url_args);
+
+  if (isset($settings['premier']) && $settings['premier']) {
+    $data = str_replace('//maps.googleapis.com', '', $settings['staticmap_url']);
+    $signature = hash_hmac('sha1', $data, base64_decode(strtr($settings['crypto_key'], '-_', '+/')), true);
+    $signature = strtr(base64_encode($signature), '+/', '-_');
+
+    $maps_url .= '&signature=' . $signature;
+  }
+
   drupal_add_js($maps_url, 'external');
   drupal_add_css(drupal_get_path('module', 'addressfield_staticmap') . '/addressfield_staticmap.css');
   $image = _addressfield_static_map_render_google_maps_image($address, $settings, $entity);
@@ -351,7 +389,6 @@ function addressfield_staticmap_field_formatter_info() {
         'scroll_lock' => FALSE,
         'info_window' => 0,
         'text_address' => 0,
-        'api_key' => '',
       ),
     ),
   );
@@ -366,13 +403,6 @@ function addressfield_staticmap_field_formatter_settings_form($field, $instance,
   $form = array();
 
   if ($display['type'] == 'addressfield_staticmap') {
-    $form['api_key'] = array(
-      '#title' => t('API Key'),
-      '#type' => 'textfield',
-      '#size' => 40,
-      '#default_value' => $settings['api_key'],
-    );
-
     $form['zoom_level'] = array(
       '#title' => t('Zoom level'),
       '#type' => 'select',
@@ -456,12 +486,8 @@ function addressfield_staticmap_field_formatter_settings_summary($field, $instan
   $display = $instance['display'][$view_mode];
   $settings = $display['settings'];
 
-  $summary = array();
-
   if ($display['type'] == 'addressfield_staticmap') {
-    $summary = t('API Key: @api_key', array('@api_key' => $settings['api_key']));
-    $summary .= '<br/>';
-    $summary .= t('Zoom level: @zoom_level', array('@zoom_level' => $settings['zoom_level']));
+    $summary = t('Zoom level: @zoom_level', array('@zoom_level' => $settings['zoom_level']));
     $summary .= '<br/>';
     $summary .= t('Map size: @map_size', array('@map_size' => $settings['map_size']));
     $summary .= '<br/>';
@@ -510,14 +536,22 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       'scroll_lock' => $display['settings']['scroll_lock'],
       'info_window' => $display['settings']['info_window'],
       'text_address' => $display['settings']['text_address'],
-      'api_key' => $display['settings']['api_key'],
     );
 
     $api = variable_get('addressfield_staticmap_api_' . $settings['index'], 'google_maps');
+    $settings['premier'] = variable_get('addressfield_staticmap_premier_' . $settings['index'], FALSE);
 
     // Display the address if the checkbox is set.
     if ($settings['text_address']) {
       $settings['text_address'] = _addressfield_staticmap_render_address($item);
+    }
+
+    if ($api !== 'mapquest' && $settings['premier'] ) {
+      $settings['client_id'] = variable_get('addressfield_staticmap_premium_client_id_' . $settings['index'], '');
+      $settings['crypto_key'] = variable_get('addressfield_staticmap_premium_crypto_key_' . $settings['index'], '');
+    }
+    else {
+      $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $settings['index'], '');
     }
 
     $entity_id_field = addressfield_entity_id_from_entity_type($entity);
@@ -526,7 +560,6 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
     if ($api == 'google_maps') {
       $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $settings['index'], '');
       $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
-      $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $settings['index'], '');
       $element[$delta]['#markup'] = _addressfield_static_map_render_google_maps_image($address, $settings, $entity);
     }
     elseif ($api == 'google_maps_api') {
