@@ -238,6 +238,7 @@ function _addressfield_static_map_render_google_maps_image($address, array $sett
   $options = array('external' => TRUE, 'https' => $is_https);
   $index = $settings['index'];
   $target = variable_get('addressfield_staticmap_gmap_link_target_' . $index, '');
+  $rel = variable_get('addressfield_staticmap_noopener_' . $index, FALSE) ? "noopener" : "";
 
   // Add 'Get directions' text link.
   if (variable_get('addressfield_staticmap_directions_link_' . $index)) {
@@ -246,13 +247,22 @@ function _addressfield_static_map_render_google_maps_image($address, array $sett
     $options['attributes'] = empty($target) ? array('title' => $link_text) : array(
       'title' => $link_text,
       'target' => $target,
+      'rel' => $rel,
     );
     $settings['directions'] = l($link_text, $url, $options);
   }
 
   // Link to actual Google map.
   if (variable_get('addressfield_staticmap_gmap_link_' . $index, FALSE)) {
-    $settings['target'] = empty($target) ? '' : drupal_attributes(array('target' => $target));
+    $attributes = array();
+    if (!empty($target)) {
+      $attributes['target'] = $target;
+    }
+    if ($target == '_blank' && !empty($rel)) {
+      $attributes['rel'] = $rel;
+    }
+
+    $settings['target'] = empty($attributes) ? '' : drupal_attributes($attributes);
     $options['query'] = array('q' => $address);
     $settings['link'] = url($url, $options);
   }

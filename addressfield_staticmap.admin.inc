@@ -227,6 +227,12 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
         '_blank' => t('Open the linked map in a new window or tab'),
       ),
     );
+    $form[$block['key']]['addressfield_staticmap_noopener_' . $i] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Add rel=noopener'),
+      '#description' => t('Add rel=noopener to links when opening a link in a new window or tab.'),
+      '#default_value' => variable_get('addressfield_staticmap_noopener_' . $i, ''),
+    );
     $form[$block['key']]['addressfield_staticmap_gmap_icon_url_' . $i] = array(
       '#type' => 'textfield',
       '#title' => t('Custom marker icon URL'),
