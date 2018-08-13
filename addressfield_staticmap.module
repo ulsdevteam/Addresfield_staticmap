@@ -308,7 +308,7 @@ function _addressfield_static_map_render_google_maps($address, array $settings, 
     $maps_url .= '&signature=' . $signature;
   }
 
-  drupal_add_js($maps_url, 'external');
+  drupal_add_js($maps_url, array('group' => 'JS_LIBRARY', 'type' => 'external'));
   drupal_add_css(drupal_get_path('module', 'addressfield_staticmap') . '/addressfield_staticmap.css');
   $image = _addressfield_static_map_render_google_maps_image($address, $settings, $entity);
   $kml_paths = array();
