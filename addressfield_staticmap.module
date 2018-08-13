@@ -78,11 +78,11 @@ function addressfield_staticmap_block_view($delta = '') {
 
   // Do this for each of the enabled address fields.
   foreach ($field_names as $field_name) {
-    if (empty($entity->entity_type)) {
+    if (empty($entity->base_type)) {
       continue;
     }
 
-    $fields = field_get_items($entity->entity_type, $entity, $field_name, $entity->language);
+    $fields = field_get_items($entity->base_type, $entity, $field_name, $entity->language);
     if (empty($fields)) {
       continue;
     }
@@ -666,18 +666,6 @@ function addressfield_staticmap_clean_address(array $address, $field_type = 'add
 }
 
 /**
- * Implements hook_entity_load().
- */
-function addressfield_staticmap_entity_load($entities, $type) {
-  // Add an additional property to entities as they are loaded so we know what the heck it actually is.
-  // This has spawned out of Drupal.org issue #1042822.
-  // Based on code from the entity_base_type module.
-  foreach ($entities as $entity) {
-    $entity->entity_type = $type;
-  }
-}
-
-/**
  * Return the ID field name for a supplied entity.
  *
  * @param object $entity
@@ -687,7 +675,7 @@ function addressfield_staticmap_entity_load($entities, $type) {
  *   The matching ID field.
  */
 function addressfield_entity_id_from_entity_type($entity) {
-  $info = entity_get_info($entity->entity_type);
+  $info = entity_get_info($entity->base_type);
   return isset($info['entity keys']['id']) ? $info['entity keys']['id'] : NULL;
 }
 
@@ -723,10 +711,10 @@ function addressfield_staticmap_preprocess(&$variables, $hook) {
 
   if ($eid_field) {
     $hooks = array(
-      'addressfield_staticmap_static_map__' . $variables['entity']->entity_type,
+      'addressfield_staticmap_static_map__' . $variables['entity']->base_type,
     );
     if (isset($variables['entity']->type)) {
-      $hooks[] = 'addressfield_staticmap_static_map__' . $variables['entity']->entity_type . '__' . $variables['entity']->type;
+      $hooks[] = 'addressfield_staticmap_static_map__' . $variables['entity']->base_type . '__' . $variables['entity']->type;
     }
     $hooks[] = 'addressfield_staticmap_static_map__entity_' . $variables['entity']->{$eid_field};
 
