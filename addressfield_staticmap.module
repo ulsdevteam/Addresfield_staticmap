@@ -225,6 +225,10 @@ function _addressfield_static_map_render_google_maps_image($address, array $sett
 
   $settings['staticmap_url'] = url('//maps.googleapis.com/maps/api/staticmap', $url_args);
 
+  if (!empty($settings['additional'])) {
+    $settings['staticmap_url'] .= '&' . $settings['additional'];
+  }
+
   if (isset($settings['premier']) && $settings['premier']) {
     $data = str_replace('//maps.googleapis.com', '', $settings['staticmap_url']);
     $signature = hash_hmac('sha1', $data, base64_decode(strtr($settings['crypto_key'], '-_', '+/')), true);
@@ -399,6 +403,7 @@ function addressfield_staticmap_field_formatter_info() {
         'scroll_lock' => FALSE,
         'info_window' => 0,
         'text_address' => 0,
+        'additional' => '',
       ),
     ),
   );
@@ -435,6 +440,13 @@ function addressfield_staticmap_field_formatter_settings_form($field, $instance,
       '#title' => t('Prevent scrolling and zooming the map.'),
       '#type' => 'checkbox',
       '#default_value' => $settings['scroll_lock'],
+    );
+
+    $form['additional'] = array(
+      '#title' => t('Additional parameters to use in the map URL (eg styling a map).'),
+      '#type' => 'textfield',
+      '#size' => 2048,
+      '#default_value' => $settings['additional'],
     );
 
     $form['info_window'] = array(
@@ -502,6 +514,10 @@ function addressfield_staticmap_field_formatter_settings_summary($field, $instan
     $summary .= t('Map size: @map_size', array('@map_size' => $settings['map_size']));
     $summary .= '<br/>';
     $summary .= t('Prevent map zoom and scroll: @scroll_lock', array('@scroll_lock' => $settings['scroll_lock'] ? t('Yes') : t('No')));
+    if ($settings['additional']) {
+      $summary .= '<br/>';
+      $summary .= t('Additional parameters: @additional', array('@additional' => $settings['additional']));
+    }
     $summary .= '<br/>';
     $summary .= t('Show the address in text format: @text_address', array('@text_address' => $settings['text_address'] ? t('Yes') : t('No')));
     $summary .= '<br/>';
@@ -544,6 +560,7 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       'scale' => $display['settings']['scale'] ? $display['settings']['scale'] : 1,
       'index' => $display['settings']['advanced_settings_index'],
       'scroll_lock' => $display['settings']['scroll_lock'],
+      'additional' => $display['settings']['additional'],
       'info_window' => $display['settings']['info_window'],
       'text_address' => $display['settings']['text_address'],
     );

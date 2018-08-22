@@ -198,6 +198,13 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
       '#title' => t('Scroll lock'),
       '#description' => t('Tick this option to disable scrolling and zooming of the map.'),
     );
+    $form[$block['key']]['addressfield_staticmap_additional_' . $i] = array(
+      '#type' => 'textfield',
+      '#title' => t('Additional Parameters'),
+      '#description' => t('Additional parameters to use in the map URL (eg styling a map)'),
+      '#default_value' => variable_get('addressfield_staticmap_additional_' . $i, ''),
+      '#required' => FALSE,
+    );
     $form[$block['key']]['addressfield_staticmap_gmap_show_address_' . $i] = array(
       '#type' => 'checkbox',
       '#title' => t('Show the address in text format'),
