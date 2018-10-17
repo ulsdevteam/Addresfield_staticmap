@@ -204,6 +204,8 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
       '#description' => t('Additional parameters to use in the map URL (eg styling a map)'),
       '#default_value' => variable_get('addressfield_staticmap_additional_' . $i, ''),
       '#required' => FALSE,
+      '#size' => 60,
+      '#maxlength' => 2048,
     );
     $form[$block['key']]['addressfield_staticmap_gmap_show_address_' . $i] = array(
       '#type' => 'checkbox',

@@ -445,7 +445,8 @@ function addressfield_staticmap_field_formatter_settings_form($field, $instance,
     $form['additional'] = array(
       '#title' => t('Additional parameters to use in the map URL (eg styling a map).'),
       '#type' => 'textfield',
-      '#size' => 2048,
+      '#size' => 60,
+      '#maxlength' => 2048,
       '#default_value' => $settings['additional'],
     );
 
@@ -515,8 +516,11 @@ function addressfield_staticmap_field_formatter_settings_summary($field, $instan
     $summary .= '<br/>';
     $summary .= t('Prevent map zoom and scroll: @scroll_lock', array('@scroll_lock' => $settings['scroll_lock'] ? t('Yes') : t('No')));
     if ($settings['additional']) {
+      $additional_display = strlen($settings['additional']) > 60 ?
+        substr($settings['additional'], 0, 60) . '...':
+        $settings['additional'];
       $summary .= '<br/>';
-      $summary .= t('Additional parameters: @additional', array('@additional' => $settings['additional']));
+      $summary .= t('Additional parameters: @additional', array('@additional' => $additional_display));
     }
     $summary .= '<br/>';
     $summary .= t('Show the address in text format: @text_address', array('@text_address' => $settings['text_address'] ? t('Yes') : t('No')));
