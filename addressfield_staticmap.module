@@ -585,8 +585,6 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $settings['index'], '');
     }
 
-    $entity_id_field = addressfield_entity_id_from_entity_type($entity);
-
     // Use Google Maps.
     if ($api == 'google_maps') {
       $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $settings['index'], '');
@@ -597,6 +595,8 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $settings['index'], '');
       $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
       $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $settings['index'], '');
+
+      $entity_id_field = addressfield_entity_id_from_entity_type($entity);
       $settings['id'] = $entity->{$entity_id_field};
       $element[$delta]['#markup'] = _addressfield_static_map_render_google_maps($address, $settings, $entity);
     }
