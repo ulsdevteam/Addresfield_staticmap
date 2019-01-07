@@ -696,7 +696,7 @@ function addressfield_staticmap_clean_address(array $address, $field_type = 'add
  *   The matching ID field.
  */
 function addressfield_entity_id_from_entity_type($entity) {
-  if (empty($entity->entity_base_type)) {
+  if (empty($entity->base_type)) {
     return NULL;
   }
 
