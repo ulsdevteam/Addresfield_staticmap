@@ -165,8 +165,8 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
     $form[$block['key']]['addressfield_staticmap_gmap_size_' . $i] = array(
       '#type' => 'textfield',
       '#title' => t('Image size'),
-      '#description' => t('Output size of the map image. Default is 400x400, must be defined in WIDTHxHEIGHT format.'),
-      '#default_value' => variable_get('addressfield_staticmap_gmap_size_' . $i, '400x400'),
+      '#description' => t('Enter a size for the map in pixels (eg \'400x400\') or leave blank for the default.<br />When using Google\'s static maps, the size will default to 400x400 if left blank.<br />When using non-static maps, a blank value can be used to apply CSS styling.'),
+      '#default_value' => variable_get('addressfield_staticmap_gmap_size_' . $i, ''),
       '#required' => TRUE,
     );
     $form[$block['key']]['addressfield_staticmap_gmap_type_' . $i] = array(
@@ -297,8 +297,8 @@ function addressfield_staticmap_admin_form_validate(array $form, array &$form_st
     }
 
     $size = $form_state['values']['addressfield_staticmap_gmap_size_' . $index];
-    if (empty($size) && !preg_match('/^([0-9]+)x([0-9]+)$/', $size)) {
-      form_set_error('addressfield_staticmap_gmap_size_' . $index, t('Invalid image size. Please enter a validly formatted dimension (ex: 400x400).'));
+    if (!empty($size) && !preg_match('/^([0-9]+)x([0-9]+)$/', $size)) {
+      form_set_error('addressfield_staticmap_gmap_size_' . $index, t('Invalid image size. Enter a size for the map in pixels (eg \'400x400\') or leave blank for the default.<br />When using Google\'s static maps, the size will default to 400x400 if left blank.<br />When using non-static maps, a blank value can be used to apply CSS styling.'));
       return;
     }
 

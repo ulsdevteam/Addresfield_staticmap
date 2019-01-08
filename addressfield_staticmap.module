@@ -5,6 +5,8 @@
  * Main file for the addressfield static map module.
  */
 
+define('DEFAULT_MAP_SIZE', '400x400');
+
 /**
  * Implements hook_permission().
  */
@@ -93,7 +95,7 @@ function addressfield_staticmap_block_view($delta = '') {
     // Configure base settings.
     $settings = array(
       'zoom' => variable_get('addressfield_staticmap_gmap_zoom_' . $index, 14),
-      'size' => variable_get('addressfield_staticmap_gmap_size_' . $index, '400x400'),
+      'size' => variable_get('addressfield_staticmap_gmap_size_' . $index, ''),
       'scroll_lock' => variable_get('addressfield_staticmap_scroll_lock_' . $index, FALSE),
       'maptype' => variable_get('addressfield_staticmap_gmap_type_' . $index, 'roadmap'),
       'scale' => variable_get('addressfield_staticmap_scale_' . $index, 1),
@@ -396,7 +398,7 @@ function addressfield_staticmap_field_formatter_info() {
       'field types' => array('addressfield', 'location'),
       'settings' => array(
         'zoom_level' => 14,
-        'map_size' => '400x400',
+        'map_size' => '',
         'map_style' => 'roadmap',
         'scale' => 1,
         'advanced_settings_index' => 0,
@@ -433,7 +435,8 @@ function addressfield_staticmap_field_formatter_settings_form($field, $instance,
       '#size' => 10,
       '#default_value' => $settings['map_size'],
       '#element_validate' => array('addressfield_staticmap_mapsize_validate'),
-      '#required' => TRUE,
+      '#required' => FALSE,
+      '#description' => t("Enter a size for the map in pixels (eg '400x400') or leave blank for the default.<br />When using Google's static maps, the size will default to " . DEFAULT_MAP_SIZE . " if left blank.<br />When using non-static maps, a blank value can be used to apply CSS styling."),
     );
 
     $form['scroll_lock'] = array(
@@ -503,6 +506,38 @@ function addressfield_staticmap_field_formatter_settings_form($field, $instance,
 }
 
 /**
+ * Get the map type being used.
+ */
+function addressfield_staticmap_get_map_type($settings) {
+  if (!array_key_exists('advanced_settings_index', $settings)) {
+    return 'google_maps';
+  }
+  return variable_get('addressfield_staticmap_api_' . $settings['advanced_settings_index'], 'google_maps');
+}
+/*
+ * Get the map size argument to use for a configuration.
+ */
+function addressfield_staticmap_get_size_args($settings) {
+  $api = addressfield_staticmap_get_map_type($settings);
+  if ($api == 'google_maps') {
+    return $settings['map_size'] ? $settings['map_size'] : DEFAULT_MAP_SIZE;
+  }
+
+  return $settings['map_size'] ? $settings['map_size'] : '';
+}
+/*
+ * Get the map size argument to use for a configuration.
+ */
+function addressfield_staticmap_get_size_description($settings) {
+  $size = addressfield_staticmap_get_size_args($settings);
+  if (empty($size)) {
+    return 'Styled using CSS';
+  }
+
+  return $size;
+}
+
+/**
  * Implements hook_field_formatter_settings_summary().
  */
 function addressfield_staticmap_field_formatter_settings_summary($field, $instance, $view_mode) {
@@ -512,7 +547,7 @@ function addressfield_staticmap_field_formatter_settings_summary($field, $instan
   if ($display['type'] == 'addressfield_staticmap') {
     $summary = t('Zoom level: @zoom_level', array('@zoom_level' => $settings['zoom_level']));
     $summary .= '<br/>';
-    $summary .= t('Map size: @map_size', array('@map_size' => $settings['map_size']));
+    $summary .= t('Map size: @map_size', array('@map_size' => addressfield_staticmap_get_size_description($settings)));
     $summary .= '<br/>';
     $summary .= t('Prevent map zoom and scroll: @scroll_lock', array('@scroll_lock' => $settings['scroll_lock'] ? t('Yes') : t('No')));
     if ($settings['additional']) {
@@ -559,7 +594,7 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
 
     $settings = array(
       'zoom' => $display['settings']['zoom_level'],
-      'size' => $display['settings']['map_size'],
+      'size' => addressfield_staticmap_get_size_args($display['settings']),
       'maptype' => $display['settings']['map_style'],
       'scale' => $display['settings']['scale'] ? $display['settings']['scale'] : 1,
       'index' => $display['settings']['advanced_settings_index'],
@@ -583,6 +618,11 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
     }
     else {
       $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $settings['index'], '');
+    }
+
+    if ($api != 'google_maps_api') {
+      // Need a size specified for static map.
+      $settings['size'] = empty($settings['size']) ? DEFAULT_MAP_SIZE : $settings['size'];
     }
 
     // Use Google Maps.
@@ -621,6 +661,10 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
  *   The complete form render array.
  */
 function addressfield_staticmap_mapsize_validate(array $element, array &$form_state, array $form) {
+  if (!$element['#value']) {
+    return;
+  }
+
   $matches = array();
   $valid = FALSE;
   if (preg_match('/[Z0-9]*x[Z0-9]*/', $element['#value'], $matches)) {

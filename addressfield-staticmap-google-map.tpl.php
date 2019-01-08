@@ -1,10 +1,10 @@
-<?php $size = explode('x', $settings['size']); ?>
+<?php $size = $settings['size'] ? explode('x', $settings['size']) : array(); ?>
 
 <?php if (isset($settings['text_address']) && is_string($settings['text_address'])): ?>
   <div><?php print $settings['text_address']; ?></div>
 <?php endif; ?>
 
-<div id="map_canvas<?php if(isset($settings['id'])) print '-'.$settings['id']; ?>" style="width: <?php print $size[0]; ?>px; height: <?php print $size[1]; ?>px;">
+<div id="map_canvas<?php if(isset($settings['id'])) print '-'.$settings['id']; ?>" <?php if (!empty($size)) { print 'style="width:' . $size[0] . 'px; height:' . $size[1] . 'px;"'; } ?>
   <noscript><?php print $image; ?></noscript>
 </div>
 
