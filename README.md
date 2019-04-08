@@ -7,4 +7,5 @@ Current Proposed Feature Addition:
 ## Associated Issue(s)
 
 <a href="https://ulstracker.atlassian.net/projects/SYSDEV/issues/SYSDEV-583"> SYSDEV-583 </a> - Created 04/10/18 - Completed 4/8/2019
+<br>
 <a href="https://ulstracker.atlassian.net/browse/SYSDEV-707"> SYSDEV-707 </a> - Created 04/10/2019
