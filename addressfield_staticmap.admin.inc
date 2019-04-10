@@ -83,6 +83,7 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
       '#options' => array(
         'google_maps' => t('Google Static Maps'),
         'google_maps_api' => t('Regular Google Maps with fallback to Static Map'),
+        'google_maps_embed' => t('Google Maps Embed Option, No fallback'),
         'mapquest' => t('Mapquest'),
       ),
     );
@@ -111,6 +112,8 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
               array("select[name=addressfield_staticmap_api_{$i}]" => array('value' => 'google_maps')),
               'or',
               array("select[name=addressfield_staticmap_api_{$i}]" => array('value' => 'google_maps_api')),
+              'or',
+              array("select[name=addressfield_staticmap_api_{$i}]" => array('value' => 'google_maps_embed')),
             ),
             ":input[name=addressfield_staticmap_premier_{$i}]" => array('checked' => FALSE),
           ),
@@ -169,6 +172,7 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
       '#default_value' => variable_get('addressfield_staticmap_gmap_size_' . $i, '400x400'),
       '#required' => TRUE,
     );
+    //Embed Does not allow for Hybrid or Terrain Options, here will be disable options based on selections  
     $form[$block['key']]['addressfield_staticmap_gmap_type_' . $i] = array(
       '#type' => 'select',
       '#title' => t('Map type'),
@@ -181,6 +185,7 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
         'hybrid' => t('Hybrid'),
       ),
     );
+        
     $form[$block['key']]['addressfield_staticmap_scale_' . $i] = array(
       '#type' => 'select',
       '#title' => t('Scale'),
@@ -191,12 +196,24 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
         2 => t('2x'),
         4 => t('4x'),
       ),
+      '#states' => array(
+          'invisible' => array(
+              //No Scale Option available for Google Embed Maps so we will hide this option
+              array("select[name=addressfield_staticmap_api_{$i}]" => array('value' => 'google_maps_embed')), 
+          ),
+      ),
     );
     $form[$block['key']]['addressfield_staticmap_scroll_lock_' . $i] = array(
       '#type' => 'checkbox',
       '#default_value' => variable_get('addressfield_staticmap_scroll_lock_' . $i, FALSE),
       '#title' => t('Scroll lock'),
       '#description' => t('Tick this option to disable scrolling and zooming of the map.'),
+      '#states' => array(
+        'invisible' => array(
+            //No Scale Option available for Google Embed Maps so we will hide this option
+            array("select[name=addressfield_staticmap_api_{$i}]" => array('value' => 'google_maps_embed')), 
+            ),
+      ),
     );
     $form[$block['key']]['addressfield_staticmap_additional_' . $i] = array(
       '#type' => 'textfield',
@@ -204,6 +221,12 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
       '#description' => t('Additional parameters to use in the map URL (eg styling a map)'),
       '#default_value' => variable_get('addressfield_staticmap_additional_' . $i, ''),
       '#required' => FALSE,
+      '#states' => array(
+          'invisible' => array(
+              //No Scale Option available for Google Embed Maps so we will hide this option
+              array("select[name=addressfield_staticmap_api_{$i}]" => array('value' => 'google_maps_embed')), 
+          ),
+      ),
     );
     $form[$block['key']]['addressfield_staticmap_gmap_show_address_' . $i] = array(
       '#type' => 'checkbox',
@@ -245,6 +268,12 @@ function addressfield_staticmap_admin_form($form, &$form_state) {
       '#title' => t('Custom marker icon URL'),
       '#description' => t('Optional URL for custom marker icon to use instead of the regular Google map marker icon. Must be smaller than 64x64.'),
       '#default_value' => variable_get('addressfield_staticmap_gmap_icon_url_' . $i, ''),
+      '#states' => array(
+          'invisible' => array(
+              //No Scale Option available for Google Embed Maps so we will hide this option
+              array("select[name=addressfield_staticmap_api_{$i}]" => array('value' => 'google_maps_embed')), 
+          ),
+      ),
     );
     $form[$block['key']]['addressfield_staticmap_directions_' . $i] = array(
       '#type' => 'fieldset',
