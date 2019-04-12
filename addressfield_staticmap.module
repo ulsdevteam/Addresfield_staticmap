@@ -133,7 +133,7 @@ function addressfield_staticmap_block_view($delta = '') {
         }
         elseif ($api == 'google_maps') {
             $block['content'] .= _addressfield_static_map_render_google_maps_image($address, $settings, $entity);
-        }         
+        }
       }
       // Use Mapquest.
       elseif ($api == 'mapquest') {
@@ -154,7 +154,6 @@ function addressfield_staticmap_block_view($delta = '') {
  * a static image fallback.
  */
 function addressfield_staticmap_theme() {
-    $tt = 1;
   return array(
     'addressfield_staticmap_google_map' => array(
       'variables' => array(
@@ -369,7 +368,7 @@ function _addressfield_static_map_render_google_maps($address, array $settings, 
  *   Rendered Google map.
  */
 function _addressfield_embed_map_render_google_maps($address, array $settings, $entity) {
-    
+
     drupal_add_css(drupal_get_path('module', 'addressfield_staticmap') . '/addressfield_staticmap.css');
     $render = theme('addressfield_staticmap_embed_map', array(
         'address' => urldecode($address),
@@ -630,7 +629,7 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
       $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $settings['index'], '');
       $settings['id'] = $entity->{$entity_id_field};
-      $element[$delta]['#markup'] = _addressfield_embed_map_render_google_maps($address, $settings, $entity);      
+      $element[$delta]['#markup'] = _addressfield_embed_map_render_google_maps($address, $settings, $entity);
     }
     // Use Mapquest.
     elseif ($api == 'mapquest') {
@@ -754,7 +753,7 @@ function _addressfield_staticmap_render_address(array $address) {
  */
 function addressfield_staticmap_preprocess(&$variables, $hook) {
 
-  
+
   if ($hook !== 'addressfield_staticmap_static_map' ||
     is_null($variables['entity'])) {
     return;
