@@ -118,35 +118,22 @@ function addressfield_staticmap_block_view($delta = '') {
       $settings['info_window'] = variable_get('addressfield_staticmap_gmap_show_info_window_' . $index, FALSE);
 
       // Use Google Maps.
-      if ($api == 'google_maps') {
+      if(strpos($api,'google')!== false){
         $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $index, '');
         $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
         $settings['premier'] = variable_get('addressfield_staticmap_premier_' . $index, '');
         $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $index, '');
         $settings['client_id'] = variable_get('addressfield_staticmap_premium_client_id_' . $index, '');
         $settings['crypto_key'] = variable_get('addressfield_staticmap_premium_crypto_key_' . $index, '');
-
-        $block['content'] .= _addressfield_static_map_render_google_maps_image($address, $settings, $entity);
-      }
-      elseif ($api == 'google_maps_api') {
-        $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $index, '');
-        $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
-        $settings['premier'] = variable_get('addressfield_staticmap_premier_' . $index, '');
-        $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $index, '');
-        $settings['client_id'] = variable_get('addressfield_staticmap_premium_client_id_' . $index, '');
-        $settings['crypto_key'] = variable_get('addressfield_staticmap_premium_crypto_key_' . $index, '');
-
-        $block['content'] .= _addressfield_static_map_render_google_maps($address, $settings, $entity);
-      }
-      elseif ($api == 'google_maps_embed') {
-        $settings['icon_url'] = variable_get('addressfield_staticmap_gmap_icon_url_' . $index, '');
-        $settings['icon_url'] = empty($settings['icon_url']) ? 'color:green' : 'icon:' . $settings['icon_url'];
-        $settings['premier'] = variable_get('addressfield_staticmap_premier_' . $index, '');
-        $settings['api_key'] = variable_get('addressfield_staticmap_api_key_' . $index, '');
-        $settings['client_id'] = variable_get('addressfield_staticmap_premium_client_id_' . $index, '');
-        $settings['crypto_key'] = variable_get('addressfield_staticmap_premium_crypto_key_' . $index, '');
-
-        $block['content'] .= _addressfield_embed_map_render_google_maps($address, $settings, $entity);
+        if(strpos($api,'api')!==false){
+            $block['content'] .= _addressfield_static_map_render_google_maps($address, $settings, $entity);
+        }
+        elseif(strpos($api,'embed')!==false){
+            $block['content'] .= _addressfield_embed_map_render_google_maps($address, $settings, $entity);
+        }
+        else{
+            $block['content'] .= _addressfield_static_map_render_google_maps_image($address, $settings, $entity);
+        }
       }
       // Use Mapquest.
       elseif ($api == 'mapquest') {
@@ -650,7 +637,6 @@ function addressfield_staticmap_field_formatter_view($entity_type, $entity, $fie
       $element[$delta]['#markup'] = _addressfield_static_map_render_mapquest_image($address, $settings);
     }
   }
-
   return $element;
 }
 
